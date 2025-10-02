@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <link rel="icon" href="favicon.ico" type="image/x-icon" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Clínica SaludSonrisa | Bienvenidos</title>
+
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback"
+    />
+    <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css" />
+    <link rel="stylesheet" href="dist/css/adminlte.min.css" />
+    <link rel="stylesheet" href="css/custom.css" />
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+      <div class="container">
+        <!-- <a class="navbar-brand" href="index.html">
+      <i class="fas fa-clinic-medical"></i>
+      <strong>Clínica SaludSonrisa</strong>
+    </a> -->
+        <div class="ml-auto">
+          <a href="login.html" class="btn btn-outline-primary"
+            >Acceso Personal</a
+          >
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="hero-background-mosaic">
+        <div
+          class="mosaic-item"
+          style="background-image: url('multimedia/1.jpg')"
+        ></div>
+        <div
+          class="mosaic-item"
+          style="background-image: url('multimedia/2.jpg')"
+        ></div>
+        <div
+          class="mosaic-item"
+          style="background-image: url('multimedia/3.jpg')"
+        ></div>
+      </div>
+      <div class="container hero-content">
+        <h1 class="hero-highlight">Bienvenidos a Clínica SaludSonrisa</h1>
+        <p class="hero-highlight">
+          Cuidando de ti y los que más quieres con una sonrisa.
+        </p>
+      </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services-section">
+      <div class="container">
+        <h2 class="section-title">Nuestras Especialidades</h2>
+        <div
+          id="specialtiesCarousel"
+          class="carousel slide"
+          data-ride="carousel"
+        >
+          <div class="carousel-inner" id="carousel-specialties-inner">
+            <!-- Carousel items will be generated here by JS -->
+          </div>
+          <a
+            class="carousel-control-prev"
+            href="#specialtiesCarousel"
+            role="button"
+            data-slide="prev"
+          >
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="sr-only">Anterior</span>
+          </a>
+          <a
+            class="carousel-control-next"
+            href="#specialtiesCarousel"
+            role="button"
+            data-slide="next"
+          >
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="sr-only">Siguiente</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <div class="social-icons mb-3">
+          <a
+            href="https://www.instagram.com/clinicasaludsonrisave/?hl=es"
+            target="_blank"
+            aria-label="Instagram"
+            ><i class="fab fa-instagram"></i
+          ></a>
+          <a
+            href="https://www.facebook.com/p/Cl%C3%ADnica-SaludSonrisa-100089365696512/"
+            target="_blank"
+            aria-label="Facebook"
+            ><i class="fab fa-facebook-f"></i
+          ></a>
+        </div>
+        <p>&copy; 2025 Clínica SaludSonrisa. Todos los derechos reservados.</p>
+      </div>
+    </footer>
+
+    <script src="plugins/jquery/jquery.min.js"></script>
+    <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="dist/js/adminlte.min.js"></script>
+
+    <script>
+      $(function () {
+        const especialidades = [
+          {
+            nombre: "Anestesiología",
+            icono: "fas fa-procedures",
+            desc: "Asistencia médica experta antes, durante y después de procedimientos quirúrgicos.",
+          },
+          {
+            nombre: "Cardiología",
+            icono: "fas fa-heartbeat",
+            desc: "Cuidado integral de la salud de tu corazón con la última tecnología.",
+          },
+          {
+            nombre: "Cirugía",
+            icono: "fas fa-cut",
+            desc: "Intervenciones quirúrgicas realizadas por un equipo de expertos altamente cualificados.",
+          },
+          {
+            nombre: "Dermatología",
+            icono: "fas fa-spa",
+            desc: "Diagnóstico y tratamiento de enfermedades de la piel, pelo y uñas.",
+          },
+          {
+            nombre: "Ecografía",
+            icono: "fas fa-wave-square",
+            desc: "Imágenes diagnósticas precisas utilizando ultrasonido para visualizar órganos internos.",
+          },
+          {
+            nombre: "Enfermería",
+            icono: "fas fa-user-nurse",
+            desc: "Atención y cuidado profesional para pacientes en todas las etapas de tratamiento.",
+          },
+          {
+            nombre: "Fisioterapia",
+            icono: "fas fa-running",
+            desc: "Programas de rehabilitación personalizados para tu pronta recuperación.",
+          },
+          {
+            nombre: "Fisatría",
+            icono: "fas fa-wheelchair",
+            desc: "Medicina física y rehabilitación para mejorar la funcionalidad y calidad de vida.",
+          },
+          {
+            nombre: "Gastrología",
+            icono: "fas fa-notes-medical",
+            desc: "Tratamiento de enfermedades del sistema digestivo y órganos asociados.",
+          },
+          {
+            nombre: "Ginecología",
+            icono: "fas fa-female",
+            desc: "Cuidado completo de la salud reproductiva y ginecológica de la mujer.",
+          },
+          {
+            nombre: "Laboratorio",
+            icono: "fas fa-vial",
+            desc: "Análisis clínicos precisos para un diagnóstico y seguimiento efectivos.",
+          },
+          {
+            nombre: "Medicina Interna",
+            icono: "fas fa-stethoscope",
+            desc: "Atención integral para adultos, enfocada en la prevención y tratamiento de enfermedades.",
+          },
+          {
+            nombre: "Nefrología",
+            icono: "fas fa-tint",
+            desc: "Estudio y tratamiento de las enfermedades del riñón y sus funciones.",
+          },
+          {
+            nombre: "Neumología",
+            icono: "fas fa-lungs",
+            desc: "Diagnóstico y manejo de patologías del sistema respiratorio.",
+          },
+          {
+            nombre: "Neurología",
+            icono: "fas fa-brain",
+            desc: "Tratamiento de trastornos del sistema nervioso, incluyendo cerebro y médula espinal.",
+          },
+          {
+            nombre: "Nutrición",
+            icono: "fas fa-apple-alt",
+            desc: "Planes de alimentación personalizados para alcanzar tus objetivos de salud.",
+          },
+          {
+            nombre: "Odontología",
+            icono: "fas fa-tooth",
+            desc: "Salud dental completa, desde limpiezas hasta tratamientos especializados.",
+          },
+          {
+            nombre: "Oftalmología",
+            icono: "fas fa-eye",
+            desc: "Cuidado de la salud visual, diagnóstico y tratamiento de enfermedades oculares.",
+          },
+          {
+            nombre: "Oncología",
+            icono: "fas fa-ribbon",
+            desc: "Manejo integral del cáncer, con un enfoque humano y multidisciplinario.",
+          },
+          {
+            nombre: "Ortodoncia",
+            icono: "fas fa-smile",
+            desc: "Tratamientos para corregir la posición de los dientes y mejorar tu sonrisa.",
+          },
+          {
+            nombre: "Otorrinología",
+            icono: "fas fa-head-side-virus",
+            desc: "Especialidad dedicada a las enfermedades del oído, nariz y garganta.",
+          },
+          {
+            nombre: "Pediatría",
+            icono: "fas fa-baby",
+            desc: "Atención médica especializada para bebés, niños y adolescentes.",
+          },
+          {
+            nombre: "Psicología",
+            icono: "fas fa-comment-dots",
+            desc: "Apoyo para el bienestar mental y emocional a través de terapia y consejería.",
+          },
+          {
+            nombre: "Psiquiatría",
+            icono: "fas fa-user-md",
+            desc: "Diagnóstico y tratamiento de trastornos mentales desde un enfoque médico.",
+          },
+          {
+            nombre: "Quirofano",
+            icono: "fas fa-bed",
+            desc: "Instalaciones modernas y seguras para todo tipo de intervenciones quirúrgicas.",
+          },
+          {
+            nombre: "Traumatología",
+            icono: "fas fa-bone",
+            desc: "Tratamiento de lesiones del aparato locomotor, incluyendo huesos y músculos.",
+          },
+          {
+            nombre: "Urología",
+            icono: "fas fa-user-tie",
+            desc: "Manejo de enfermedades del sistema urinario en hombres y mujeres.",
+          },
+        ];
+
+        // Función para dividir el array en grupos (chunks)
+        function chunkArray(myArray, chunk_size) {
+          var index = 0;
+          var arrayLength = myArray.length;
+          var tempArray = [];
+          for (index = 0; index < arrayLength; index += chunk_size) {
+            myChunk = myArray.slice(index, index + chunk_size);
+            tempArray.push(myChunk);
+          }
+          return tempArray;
+        }
+
+        const specialtiesChunks = chunkArray(especialidades, 3); // Agrupar en conjuntos de 3
+
+        const carouselInner = $("#carousel-specialties-inner");
+
+        specialtiesChunks.forEach(function (chunk, chunkIndex) {
+          let carouselItemHtml = `<div class="carousel-item ${
+            chunkIndex === 0 ? "active" : ""
+          }"><div class="row">`;
+          chunk.forEach(function (esp, itemIndex) {
+            // Alternar el color del icono. El segundo (índice 1) será verde.
+            const iconColorClass = itemIndex === 1 ? "icon-green" : "";
+            carouselItemHtml += `
+                <div class="col-md-4 mb-4">
+                    <div class="service-card">
+                        <div class="icon ${iconColorClass}"><i class="${esp.icono}"></i></div>
+                        <h4>${esp.nombre}</h4>
+                        <p>${esp.desc}</p>
+                    </div>
+                </div>
+            `;
+          });
+          carouselItemHtml += `</div></div>`;
+          carouselInner.append(carouselItemHtml);
+        });
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <link rel="icon" href="favicon.ico" type="image/x-icon" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Clínica SaludSonrisa | Login</title>
+
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback"
+    />
+    <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css" />
+    <link
+      rel="stylesheet"
+      href="plugins/icheck-bootstrap/icheck-bootstrap.min.css"
+    />
+    <link rel="stylesheet" href="dist/css/adminlte.min.css" />
+    <link rel="stylesheet" href="css/custom.css" />
+    <!-- Incluir custom.css -->
+  </head>
+  <body class="login-page" style="background-image: url('multimedia/principal.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+    <div class="login-box">
+      <div class="card">
+        <div class="card-body login-card-body">
+          <div class="login-logo">
+            <a href="index.html"><b>Clínica Salud</b>Sonrisa</a>
+          </div>
+          <p class="login-box-msg">Inicia sesión para acceder al sistema</p>
+
+          <form id="form-login">
+            <div
+              class="alert alert-danger"
+              id="error-message"
+              style="display: none"
+            ></div>
+            <div class="input-group mb-3">
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Usuario"
+                name="username"
+                required
+              />
+              <div class="input-group-append">
+                <div class="input-group-text">
+                  <span class="fas fa-user"></span>
+                </div>
+              </div>
+            </div>
+            <div class="input-group mb-3">
+              <input
+                type="password"
+                class="form-control"
+                placeholder="Contraseña"
+                name="password"
+                required
+              />
+              <div class="input-group-append">
+                <div class="input-group-text">
+                  <span class="fas fa-lock"></span>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12">
+                <button type="submit" class="btn btn-primary btn-block">
+                  Iniciar Sesión
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script src="plugins/jquery/jquery.min.js"></script>
+    <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="dist/js/adminlte.min.js"></script>
+
+    <script>
+      $(function () {
+        $("#form-login").on("submit", function (e) {
+          e.preventDefault();
+          $("#error-message").hide();
+
+          $.ajax({
+            url: "api/login.php",
+            type: "POST",
+            data: $(this).serialize(),
+            dataType: "json",
+            success: function (response) {
+              if (response.status === "success") {
+                window.location.href = "app_inicio.php"; // Redirigir a la página inicial con menú y modal
+              } else {
+                $("#error-message").text(response.message).show();
+              }
+            },
+            error: function () {
+              $("#error-message")
+                .text("Error de conexión con el servidor.")
+                .show();
+            },
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

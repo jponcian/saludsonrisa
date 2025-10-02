@@ -1,0 +1,19 @@
+<?php
+require_once 'auth_check.php';
+require_once 'conexion.php';
+header('Content-Type: application/json');
+if ($rol === 'Estandar') {
+    echo json_encode(['status' => 'error', 'message' => 'No tienes permisos para eliminar consultas.']);
+    exit;
+}
+$id = isset($_POST['id']) ? intval($_POST['id']) : 0;
+if ($id <= 0) {
+    echo json_encode(['status' => 'error', 'message' => 'ID inválido.']);
+    exit;
+}
+$stmt = $pdo->prepare('DELETE FROM consultas WHERE id = ?');
+if ($stmt->execute([$id])) {
+    echo json_encode(['status' => 'success', 'message' => 'Consulta eliminada correctamente.']);
+} else {
+    echo json_encode(['status' => 'error', 'message' => 'Error al eliminar consulta.']);
+}
