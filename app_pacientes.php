@@ -31,6 +31,41 @@ if ($rol === 'especialista') {
   <link rel="stylesheet" href="plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
   <link rel="stylesheet" href="dist/css/adminlte.min.css">
   <link rel="stylesheet" href="css/custom.css">
+  <style>
+    .tooltip-inner {
+      background: linear-gradient(90deg, #2196f3 0%, #43e97b 100%);
+      color: #fff;
+    }
+
+    .tooltip .tooltip-arrow {
+      border-top-color: #2196f3;
+    }
+
+    .btn-circle {
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      border: none;
+    }
+
+    .btn-circle:hover {
+      transform: scale(1.05);
+    }
+
+    .btn.btn-info:hover {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 0 20px rgba(23, 162, 184, 0.5);
+      transform: scale(1.05);
+    }
+
+    .btn.btn-warning:hover {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 0 20px rgba(255, 193, 7, 0.5);
+      transform: scale(1.05);
+    }
+
+    .btn.btn-danger:hover {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 0 20px rgba(220, 53, 69, 0.5);
+      transform: scale(1.05);
+    }
+  </style>
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -446,7 +481,10 @@ if ($rol === 'especialista') {
             dataSrc: "data"
           },
           columns: [{
-              "data": "id"
+              "data": "id",
+              render: function(data, type, row, meta) {
+                return meta.settings._iDisplayStart + meta.row + 1;
+              }
             },
             {
               "data": "cedula"
@@ -495,10 +533,10 @@ if ($rol === 'especialista') {
               render: function(data, type, row) {
                 var patientData = JSON.stringify(row);
                 // var html = "<button class='btn btn-success btn-sm btn-crear-consulta' data-paciente='" + patientData + "'>Crear Consulta</button> " +
-                var html = "<button class='btn btn-info btn-sm btn-ver-paciente' data-id='" + row.id + "'>Ver</button> " +
-                  "<button class='btn btn-warning btn-sm btn-editar-paciente' data-paciente='" + patientData + "'>Editar</button>";
+                var html = "<button class='btn btn-info btn-sm btn-ver-paciente' data-id='" + row.id + "' data-toggle='tooltip' data-placement='top' title='Ver paciente'><i class='fas fa-eye'></i></button> " +
+                  "<button class='btn btn-warning btn-sm btn-editar-paciente' data-paciente='" + patientData + "' data-toggle='tooltip' data-placement='top' title='Editar paciente'><i class='fas fa-edit'></i></button>";
                 if (usuarioRol !== 'Estandar') {
-                  html += " <button class='btn btn-danger btn-sm btn-eliminar-paciente' data-id='" + row.id + "'><i class='fas fa-trash'></i> Eliminar</button>";
+                  html += " <button class='btn btn-danger btn-sm btn-eliminar-paciente' data-id='" + row.id + "' data-toggle='tooltip' data-placement='top' title='Eliminar paciente'><i class='fas fa-trash'></i></button>";
                 }
                 return html;
               }
@@ -508,6 +546,13 @@ if ($rol === 'especialista') {
             url: "plugins/datatables/i18n/Spanish.json"
           }
         });
+
+        // Inicializar tooltips después de dibujar la tabla
+        tablaPacientes.on('draw', function() {
+          $('[data-toggle="tooltip"]').tooltip();
+        });
+        // Inicializar tooltips para el primer draw
+        $('[data-toggle="tooltip"]').tooltip();
 
         // Envío AJAX del formulario Registrar Paciente (evita GET con parámetros enormes en la URL)
         $('#form-registrar-paciente').on('submit', function(e) {
@@ -951,37 +996,45 @@ if ($rol === 'especialista') {
       // Eliminar paciente
       $('#tabla-pacientes tbody').on('click', '.btn-eliminar-paciente', function() {
         var id = $(this).data('id');
-        Swal.fire({
-          title: '¿Eliminar paciente?',
-          text: 'Esta acción no se puede deshacer.',
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonText: 'Sí, eliminar',
-          cancelButtonText: 'Cancelar',
-          confirmButtonColor: '#d33',
-          reverseButtons: true
-        }).then((result) => {
-          if (result.isConfirmed) {
-            $.ajax({
-              url: 'api/eliminar_paciente.php',
-              type: 'POST',
-              data: {
-                id: id
-              },
-              dataType: 'json',
-              success: function(response) {
-                if (response.status === 'success') {
-                  Swal.fire('Eliminado', response.message, 'success');
-                  tablaPacientes.ajax.reload();
-                } else {
-                  Swal.fire('Error', response.message, 'error');
-                }
-              },
-              error: function() {
-                Swal.fire('Error', 'No se pudo eliminar el paciente.', 'error');
+        // Verificar si el paciente tiene un plan asignado
+        $.get('api/facturacion_suscripcion_actual.php?id_paciente=' + id, function(response) {
+          if (response.status === 'ok' && response.data) {
+            Swal.fire('No se puede eliminar', 'El paciente tiene un plan de medicina prepagada asignado.', 'error');
+          } else {
+            Swal.fire({
+              title: '¿Eliminar paciente?',
+              text: 'Esta acción no se puede deshacer.',
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonText: 'Sí, eliminar',
+              cancelButtonText: 'Cancelar',
+              confirmButtonColor: '#d33'
+            }).then((result) => {
+              if (result.isConfirmed) {
+                $.ajax({
+                  url: 'api/eliminar_paciente.php',
+                  type: 'POST',
+                  data: {
+                    id: id
+                  },
+                  dataType: 'json',
+                  success: function(response) {
+                    if (response.status === 'success') {
+                      Swal.fire('Eliminado', response.message, 'success');
+                      tablaPacientes.ajax.reload();
+                    } else {
+                      Swal.fire('Error', response.message, 'error');
+                    }
+                  },
+                  error: function() {
+                    Swal.fire('Error', 'No se pudo eliminar el paciente.', 'error');
+                  }
+                });
               }
             });
           }
+        }, 'json').fail(function() {
+          Swal.fire('Error', 'No se pudo verificar el plan del paciente.', 'error');
         });
       });
 
@@ -997,8 +1050,7 @@ if ($rol === 'especialista') {
           showCancelButton: true,
           confirmButtonText: 'Sí, eliminar',
           cancelButtonText: 'Cancelar',
-          confirmButtonColor: '#d33',
-          reverseButtons: true
+          confirmButtonColor: '#d33'
         }).then((result) => {
           if (result.isConfirmed) {
             $.ajax({

@@ -1,0 +1,10 @@
+vendor/
+composer.lock
+demo/webrtc_secrets.php
+demo/frames/
+*.log
+*.tmp
+*.swp
+node_modules/
+uploads/
+_basura/

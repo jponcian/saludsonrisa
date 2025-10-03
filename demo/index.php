@@ -76,6 +76,7 @@ $reuniones = $pdo->query("SELECT * FROM demo_reuniones ORDER BY fecha DESC, hora
                                     <a class="btn btn-sm btn-primary" href="participantes.php?id=<?= $r['id'] ?>&embed=1"><i class="fas fa-users"></i> Participantes</a>
                                     <a class="btn btn-sm btn-secondary" href="generar_qr.php?id=<?= $r['id'] ?>&embed=1"><i class="fas fa-qrcode"></i> Carnets</a>
                                     <a class="btn btn-sm btn-success" href="asistencia.php?id=<?= $r['id'] ?>&embed=1"><i class="fas fa-check-circle"></i> Asistencia</a>
+                                    <a class="btn btn-sm btn-warning" href="transmitir.php?id=<?= $r['id'] ?>&embed=1"><i class="fas fa-video"></i> Transmitir</a>
                                     <a class="btn btn-sm btn-danger" href="#" onclick="eliminarReunion(<?= $r['id'] ?>); return false;"><i class="fas fa-trash"></i> Eliminar</a>
                                 </td>
                             </tr>
@@ -104,10 +105,10 @@ $reuniones = $pdo->query("SELECT * FROM demo_reuniones ORDER BY fecha DESC, hora
             if (result.isConfirmed) {
                 fetch('eliminar_reunion.php?id=' + id)
                     .then(() => {
-                        showGlobalSweetAlert({ 
-                            title: 'Eliminado', 
-                            text: 'La reunión fue eliminada.', 
-                            icon: 'success' 
+                        showGlobalSweetAlert({
+                            title: 'Eliminado',
+                            text: 'La reunión fue eliminada.',
+                            icon: 'success'
                         }, () => {
                             location.reload();
                         });

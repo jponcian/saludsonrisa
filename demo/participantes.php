@@ -93,7 +93,7 @@ $result = $participantes->fetchAll();
                                         <td><?= htmlspecialchars($row['nombre']) ?></td>
                                         <td>
                                             <a class="btn btn-danger btn-sm" href="#" onclick="eliminarParticipante(<?= $row['id'] ?>, <?= $id_reunion ?>); return false;" title="Eliminar">
-                                                <i class="fas fa-trash"></i> Eliminar
+                                                <i class="fas fa-trash"></i>
                                             </a>
                                         </td>
                                     </tr>

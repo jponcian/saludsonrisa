@@ -46,7 +46,7 @@ $iframe_src .= (strpos($iframe_src, '?') !== false ? '&' : '?') . 'embed=1';
         .demo-frame {
             width: 100%;
             border: none;
-            display: block;
+            flex-grow: 1;
         }
 
         .swal2-container {
@@ -54,6 +54,11 @@ $iframe_src .= (strpos($iframe_src, '?') !== false ? '&' : '?') . 'embed=1';
             position: fixed !important;
             inset: 0 !important;
         }
+		
+		.card-body {
+			display: flex;
+			flex-direction: column;
+		}
     </style>
 </head>
 
@@ -122,7 +127,7 @@ $iframe_src .= (strpos($iframe_src, '?') !== false ? '&' : '?') . 'embed=1';
                                 <?php endif; ?>
                             </div>
                         </div>
-                        <div class="card-body p-0">
+                        <div class="card-body">
                             <iframe id="demoFrame" class="demo-frame"
                                 src="<?php echo htmlspecialchars($iframe_src); ?>"></iframe>
                         </div>
@@ -141,20 +146,23 @@ $iframe_src .= (strpos($iframe_src, '?') !== false ? '&' : '?') . 'embed=1';
 
     <script>
         // Listener para SweetAlert desde el iframe
-        window.addEventListener('message', function (event) {
+        window.addEventListener('message', function(event) {
             // Por seguridad, podrías verificar event.origin aquí
             if (event.data && event.data.action === 'showSweetAlert') {
                 const iframe = document.getElementById('demoFrame');
                 Swal.fire(event.data.options).then((result) => {
                     // Opcional: devolver el resultado al iframe
                     if (iframe) {
-                        iframe.contentWindow.postMessage({ action: 'sweetAlertResult', result: result }, '*');
+                        iframe.contentWindow.postMessage({
+                            action: 'sweetAlertResult',
+                            result: result
+                        }, '*');
                     }
                 });
             }
         });
 
-        (function () {
+        (function() {
             const iframe = document.getElementById('demoFrame');
             if (!iframe) return;
 
@@ -178,7 +186,14 @@ $iframe_src .= (strpos($iframe_src, '?') !== false ? '&' : '?') . 'embed=1';
                         doc.head.appendChild(fontawesome_css);
 
                         const customStyle = doc.createElement('style');
-                        customStyle.textContent = `body { background-color: transparent !important; }`;
+                        customStyle.textContent = `
+                            body { background-color: transparent !important; }
+                            #reader video {
+                                width: 100% !important;
+                                height: auto !important;
+                                object-fit: contain;
+                            }
+                        `;
                         doc.head.appendChild(customStyle);
 
                         // Scripts (se inyectan en el body)
