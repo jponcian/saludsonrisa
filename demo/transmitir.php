@@ -57,10 +57,10 @@ $result = $participantes->fetchAll();
                                 <?php endif; ?>
                                 <?php $i = 1;
                                 foreach ($result as $row): ?>
-                                    <tr>
+                                    <tr data-participante-id="<?= (int)$row['id'] ?>">
                                         <td><?= $i++ ?>.</td>
                                         <td><?= htmlspecialchars($row['nombre']) ?></td>
-                                        <td>
+                                        <td class="estado-col">
                                             <?php if ($row['asistio']): ?>
                                                 <i class="fas fa-check text-success" title="Ingresado"></i>
                                             <?php else: ?>
@@ -218,6 +218,29 @@ $result = $participantes->fetchAll();
 
                 // Iniciar fallback de frames
                 iniciarEnvioFrames();
+
+                // Iniciar polling de estados de participantes (actualiza iconos)
+                let estadoTimer = setInterval(async function() {
+                    try {
+                        const res = await fetch('get_participantes_estado.php?reunion=<?php echo $id_reunion; ?>');
+                        const data = await res.json();
+                        if (data && data.success && Array.isArray(data.data)) {
+                            data.data.forEach(p => {
+                                const row = document.querySelector('tr[data-participante-id="' + p.id + '"]');
+                                if (!row) return;
+                                const col = row.querySelector('.estado-col');
+                                if (!col) return;
+                                if (p.asistio) {
+                                    col.innerHTML = '<i class="fas fa-check text-success" title="Ingresado"></i>';
+                                } else {
+                                    col.innerHTML = '<i class="fas fa-minus-circle text-danger" title="No ingresado"></i>';
+                                }
+                            });
+                        }
+                    } catch (e) {
+                        // Silenciar errores de polling
+                    }
+                }, 3000);
             } catch (error) {
                 console.error('Error:', error);
                 alert('Error al acceder a la cámara: ' + error.message);

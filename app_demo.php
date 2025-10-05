@@ -15,6 +15,8 @@ function demo_url($page, $id)
             return $base_path . 'generar_qr.php?id=' . $id;
         case 'asistencia':
             return $base_path . 'asistencia.php?id=' . $id;
+        case 'transmitir':
+            return $base_path . 'transmitir.php?id=' . $id;
         case 'qr_info':
             return $base_path . 'qr_info.php?id=' . $id;
         case 'index':
@@ -54,11 +56,11 @@ $iframe_src .= (strpos($iframe_src, '?') !== false ? '&' : '?') . 'embed=1';
             position: fixed !important;
             inset: 0 !important;
         }
-		
-		.card-body {
-			display: flex;
-			flex-direction: column;
-		}
+
+        .card-body {
+            display: flex;
+            flex-direction: column;
+        }
     </style>
 </head>
 
@@ -124,6 +126,9 @@ $iframe_src .= (strpos($iframe_src, '?') !== false ? '&' : '?') . 'embed=1';
                                     <a class="btn btn-success btn-sm"
                                         href="app_demo.php?page=asistencia&id=<?php echo $id; ?>"><i
                                             class="fas fa-check-circle"></i> Asistencia</a>
+                                    <a class="btn btn-warning btn-sm"
+                                        href="app_demo.php?page=transmitir&id=<?php echo $id; ?>"><i
+                                            class="fas fa-video"></i> Transmitir</a>
                                 <?php endif; ?>
                             </div>
                         </div>

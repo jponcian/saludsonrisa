@@ -118,6 +118,34 @@ $token_valido = ($participante['token'] && hash_equals($participante['token'], $
                     }
                 });
 
+                // Al cargar el viewer, notificar al backend que el participante llegó (registrar asistencia)
+                (async function registrarLlegada() {
+                    try {
+                        const resp = await fetch('registrar_asistencia.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                            body: 'reunion=<?php echo $id_reunion; ?>&participante=<?php echo $id_participante; ?>&token=<?php echo rawurlencode($token); ?>'
+                        });
+                        const j = await resp.json();
+                        if (j && j.success) {
+                            console.log('[Viewer] Asistencia registrada:', j.nombre || 'ok');
+                            // notificar al padre (si está embebido) para actualizar UI adicional
+                            if (window.parent && window.parent !== window) {
+                                window.parent.postMessage({
+                                    action: 'participante_llego',
+                                    participante: <?php echo $id_participante; ?>
+                                }, '*');
+                            }
+                        } else {
+                            console.log('[Viewer] Registrar asistencia respuesta:', j);
+                        }
+                    } catch (e) {
+                        console.error('[Viewer] Error registrando asistencia:', e);
+                    }
+                })();
+
                 // Escuchar llamadas entrantes (cuando el transmisor inicia la llamada tras recibir 'solicitar-stream')
                 peer.on('call', function(call) {
                     console.log('[Viewer] Llamada entrante desde', call.peer, '— respondiendo...');
