@@ -4,7 +4,6 @@
   const txtPacienteNombre = $("#txtPacienteNombre");
   const txtPlanE = $("#txtPlanE");
   const txtCoberturaE = $("#txtCoberturaE");
-  const txtUrgenciaE = $("#txtUrgenciaE");
   const txtEstadoProcesoE = $("#txtEstadoProcesoE");
   const tablaHistorial = $("#tablaHistorialPaciente tbody");
   const txtDiagnostico = $("#txtDiagnostico");
@@ -54,7 +53,6 @@
     txtPacienteNombre.val(pr.paciente || "");
     txtPlanE.val(pr.plan || "");
     txtCoberturaE.val(pr.cobertura || "");
-    txtUrgenciaE.val(pr.urgencia || "");
     txtEstadoProcesoE.val(pr.estado || "");
     btnGuardar.prop("disabled", false);
     cargarHistorial(pr.id_paciente);
@@ -65,7 +63,6 @@
     txtPacienteNombre.val("");
     txtPlanE.val("");
     txtCoberturaE.val("");
-    txtUrgenciaE.val("");
     txtEstadoProcesoE.val("");
     tablaHistorial.empty();
     btnGuardar.prop("disabled", true);

@@ -296,12 +296,9 @@
   function abrirProceso() {
     const id_paciente = selPaciente.val();
     if (!id_paciente) return;
-
     const p = _pacientesCache.find((x) => x.id == id_paciente);
-
     const obs = (txtObs.val() || "").trim();
     btnAbrir.prop("disabled", true);
-    lblProcesoMsg.removeClass("text-danger text-success").text("Guardando...");
     api("api/atencion_crear_proceso.php", {
       id_paciente,
       obs,
@@ -317,16 +314,23 @@
             timer: 2000,
             showConfirmButton: false
           });
-          lblProcesoMsg.text(""); // Limpiar el label de mensaje
           txtObs.val("");
           cargarProcesos();
         } else {
-          lblProcesoMsg.text(resp.message || "Error").addClass("text-danger");
+          Swal.fire({
+            icon: 'error',
+            title: 'Error al Abrir Proceso',
+            text: resp.message || 'Ocurrió un error inesperado.'
+          });
         }
       })
-      .fail(() =>
-        lblProcesoMsg.text("Error de conexión").addClass("text-danger")
-      )
+      .fail(() => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error de Conexión',
+          text: 'No se pudo comunicar con el servidor.'
+        });
+      })
       .always(() => btnAbrir.prop("disabled", false));
   }
 

@@ -66,19 +66,15 @@
                                 </div>
                             </div>
                             <div class="form-row">
-                                <div class="form-group col-md-3">
+                                <div class="form-group col-md-4">
                                     <label>Plan</label>
                                     <input id="txtPlanE" class="form-control" readonly>
                                 </div>
-                                <div class="form-group col-md-3">
+                                <div class="form-group col-md-4">
                                     <label>Cobertura</label>
                                     <input id="txtCoberturaE" class="form-control" readonly>
                                 </div>
-                                <div class="form-group col-md-3">
-                                    <label>Urgencia</label>
-                                    <input id="txtUrgenciaE" class="form-control" readonly>
-                                </div>
-                                <div class="form-group col-md-3">
+                                <div class="form-group col-md-4">
                                     <label>Estado Proceso</label>
                                     <input id="txtEstadoProcesoE" class="form-control" readonly>
                                 </div>
