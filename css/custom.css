@@ -1,4 +1,7 @@
-.sidebar-dark-primary .nav-sidebar.nav-pills .nav-item > .nav-link.sidebar-parent-active.active {
+.sidebar-dark-primary
+  .nav-sidebar.nav-pills
+  .nav-item
+  > .nav-link.sidebar-parent-active.active {
   background-color: transparent !important;
   color: #fff !important;
 }
@@ -50,46 +53,9 @@ body {
 
 .container {
   max-width: 1140px;
-  margin: 0 auto;
-  padding: 0 15px;
-}
-
-/* Navbar */
-.navbar {
-  background-color: #fff;
-  border-bottom: 1px solid #eee;
-  padding: 1rem 0;
-}
-
-.navbar-brand {
-  font-size: 1.5rem;
-  color: #007bff;
-}
-
-.navbar-brand .fa-clinic-medical {
-  margin-right: 10px;
-}
-
-/* Hero Section */
-.hero-section {
-  position: relative;
-  height: 60vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  color: white;
-  overflow: hidden;
-}
-
-.hero-background-mosaic {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  .plan-cta {
+    border: 1px solid rgba(0, 0, 0, 0.04);
+  }
   grid-template-rows: 1fr;
   /* Ajustes visuales para resaltar la imagen central */
   z-index: 1;
@@ -152,8 +118,26 @@ p.hero-highlight {
 
 /* Services Section */
 .services-section {
-  padding: 4rem 0;
-  background-color: #f9f9f9;
+  /* Espaciado reducido para acercar con la sección anterior */
+  padding: 1rem 0 2rem 0;
+  /* Degradado azul -> verde coherente con el sitio */
+  background: linear-gradient(90deg, #2196f3, #43e97b);
+  color: #fff;
+}
+
+/* Ajustes para legibilidad dentro de Services */
+.services-section .section-title {
+  color: #fff;
+}
+.services-section .service-card {
+  background: #fff;
+  color: #222;
+}
+.services-section .service-card h4 {
+  color: #222;
+}
+.services-section .service-card p {
+  color: #555;
 }
 
 .section-title {
@@ -207,6 +191,12 @@ p.hero-highlight {
   padding: 20px;
 }
 
+/* Ocultar flechas solo en el carousel de Nuestras Especialidades */
+#specialtiesCarousel .carousel-control-prev,
+#specialtiesCarousel .carousel-control-next {
+  display: none !important;
+}
+
 /* Footer */
 .footer {
   background-color: #343a40;
@@ -224,4 +214,264 @@ p.hero-highlight {
 
 .footer .social-icons a:hover {
   color: #007bff;
+}
+
+.hero-section {
+  /* Degradado azul -> verde para fondo continuo con las secciones siguientes */
+  background: linear-gradient(90deg, #2196f3 0%, #43e97b 100%);
+}
+
+.hero-video-wrapper {
+  position: relative;
+  overflow: hidden;
+  /* Transparente para permitir que .hero-section actúe como fondo continuo */
+  background: transparent;
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.hero-video {
+  position: absolute;
+  inset: 0; /* top:0; right:0; bottom:0; left:0; */
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* cubre el contenedor manteniendo proporción */
+  z-index: 0;
+  filter: saturate(0.96) contrast(1.02);
+}
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  /* Overlay sutil para mejorar contraste sobre el vídeo */
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.28));
+  z-index: 1;
+}
+.hero-content--center {
+  position: relative;
+  z-index: 2;
+  color: #fff;
+  padding: 3rem 0;
+  text-align: center;
+}
+.hero-sub {
+  color: #fff;
+  opacity: 0.95;
+  font-size: 1.15rem;
+  margin-top: 0.5rem;
+}
+.hero-cta {
+  margin-top: 1.25rem;
+}
+.hero-play-btn {
+  position: absolute;
+  z-index: 3;
+  right: 20px;
+  bottom: 20px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+  cursor: pointer;
+}
+@media (max-width: 767px) {
+  .hero-video {
+    display: none;
+  }
+  .hero-video-wrapper {
+    background-image: url("../multimedia/hero.jpg");
+    background-size: cover;
+    background-position: center;
+    min-height: 40vh;
+  }
+  .hero-play-btn {
+    right: 16px;
+    bottom: 16px;
+    display: block;
+  }
+}
+
+/* Featured services */
+.services-featured {
+  padding: 4rem 0;
+  background: #fff;
+}
+.service-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.service-card .icon {
+  font-size: 2.25rem;
+  color: #007bff;
+  margin-bottom: 0.75rem;
+}
+
+/* Testimonials */
+.testimonials-section {
+  padding: 3rem 0;
+  background: linear-gradient(180deg, #f8f9fb, #fff);
+}
+.testimonial-card {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+}
+.testimonial-card p {
+  font-style: italic;
+  color: #444;
+}
+
+/* Plans / Pricing */
+.plans-section {
+  /* Espaciado reducido para acercar con la siguiente sección */
+  padding: 1.5rem 0 0.75rem 0;
+  /* Sin fondo: transparente para integrarse con el layout */
+  background: transparent;
+  color: #333;
+}
+/* Ajustes para textos dentro de la sección de planes sobre fondo claro */
+.plans-section .section-title,
+.plans-section .lead,
+.plans-section .plan-intro {
+  color: #222;
+}
+.plans-section .plan-intro .display-4 small.text-muted {
+  color: #6c757d;
+}
+.plans-section .plan-card {
+  background: #fff;
+  color: #222;
+}
+.plans-section .plan-cta {
+  background: #f8f9fa;
+  color: #222;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+.plan-intro {
+  margin-bottom: 1rem;
+}
+.table-pricing thead th {
+  background: linear-gradient(90deg, #43e97b, #2196f3);
+  color: #fff;
+}
+.table-pricing tbody td {
+  vertical-align: middle;
+  padding: 1.1rem;
+  font-weight: 600;
+}
+.plan-cta {
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+/* Beneficios y avatar en la columna lateral */
+.benefits-list .benefit-item {
+  align-items: flex-start;
+}
+.feature-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
+  flex: 0 0 56px;
+  font-size: 1.25rem;
+}
+.feature-avatar i {
+  display: inline-block;
+}
+
+/* Tabla comparativa en la columna lateral */
+.table-pricing thead th {
+  background: linear-gradient(90deg, #43e97b, #2196f3);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  border: none;
+}
+.table-pricing tbody td {
+  border-top: 1px solid rgba(0, 0, 0, 0.04);
+  font-size: 0.9rem;
+}
+.table-pricing.table-sm td,
+.table-pricing.table-sm th {
+  padding: 0.45rem 0.5rem;
+}
+
+@media (max-width: 767px) {
+  .plan-cta {
+    padding: 1rem;
+  }
+  .table-pricing thead th {
+    font-size: 0.85rem;
+  }
+  .feature-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+  }
+}
+
+/* Plan cards */
+.plan-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.plan-name {
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+.plan-price-sub {
+  color: #666;
+  font-size: 0.95rem;
+}
+.plan-price-month {
+  font-size: 1.25rem;
+  margin-top: 0.4rem;
+  color: #222;
+}
+.plan-features {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 0.75rem;
+}
+.plan-features li {
+  margin-bottom: 0.35rem;
+}
+
+/* Contact CTA */
+.contact-cta {
+  padding: 2.5rem 0;
+  /* Sin fondo: transparente */
+  background: transparent;
+  color: #222;
+}
+.contact-cta .contact-cta-box {
+  /* Caja interna blanca para mantener contraste sobre fondo claro */
+  background: #fff;
+  padding: 1.25rem 1.5rem;
+  border-radius: 8px;
+  color: #222;
+}
+.contact-cta h3 {
+  color: #222;
+  margin-bottom: 0.25rem;
+}
+
+/* Small utility */
+.btn-outline-light {
+  border-color: rgba(255, 255, 255, 0.28);
+  color: #fff;
+}
+.btn-outline-light:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
 }

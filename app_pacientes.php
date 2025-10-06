@@ -1,4 +1,3 @@
-<script src="plugins/sweetalert2/sweetalert2.all.min.js"></script>
 <?php
 require_once 'api/auth_check.php';
 $current_page = basename($_SERVER['PHP_SELF']);
@@ -308,7 +307,7 @@ if ($rol === 'especialista') {
     <script src="plugins/ekko-lightbox/ekko-lightbox.min.js"></script>
     <script src="plugins/select2/js/select2.full.min.js"></script>
     <script src="dist/js/adminlte.min.js"></script>
-
+    <script src="plugins/sweetalert2/sweetalert2.all.min.js"></script>
 
     <script>
       var tablaPacientes; // Declarar tablaPacientes en un ámbito superior

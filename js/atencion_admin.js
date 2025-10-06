@@ -9,8 +9,6 @@
   const txtDiasRestantes = $("#txtDiasRestantes");
   const resumenConsumos = $("#resumenConsumos");
   const tablaConsumos = $("#tablaConsumos tbody");
-  const txtMotivo = $("#txtMotivo");
-  const selUrgencia = $("#selUrgencia");
   const txtObs = $("#txtObs");
   const btnAbrir = $("#btnAbrirProceso");
   const tablaProcesos = $("#tablaProcesos tbody");
@@ -72,12 +70,7 @@
             placeholder: "-- Seleccione --",
             width: "100%",
           });
-          // Hacer select2 también el de urgencia
-          selUrgencia.select2({
-            theme: "bootstrap4",
-            placeholder: "-- Seleccione --",
-            width: "100%",
-          });
+          // Select2 inicializado sólo para paciente (urgencia removida en formulario)
         } else {
           selPaciente.html('<option value="">Sin datos</option>');
         }
@@ -93,19 +86,22 @@
     }
     txtPlan.val(p.plan_nombre || "");
     const estado = (p.estado_plan || "").toLowerCase();
+    let estadoTexto = p.estado_plan || "Sin Plan";
     if (estado === "activo") {
       txtEstadoPlan
         .text("Activo")
         .removeClass("badge-secondary badge-warning")
         .addClass("badge-success");
+      estadoTexto = "Activo";
     } else if (estado === "pendiente") {
       txtEstadoPlan
         .text("En espera")
         .removeClass("badge-secondary badge-success")
         .addClass("badge-warning");
+      estadoTexto = "En espera";
     } else {
       txtEstadoPlan
-        .text(p.estado_plan || "Sin Plan")
+        .text(estadoTexto)
         .removeClass("badge-success badge-warning")
         .addClass("badge-secondary");
     }
@@ -118,6 +114,21 @@
     if (p.cobertura_activa === "si") btnAbrir.prop("disabled", false);
     else btnAbrir.prop("disabled", true);
     cargarConsumos(id);
+
+    let iconType = 'info';
+    if (estado === 'activo') {
+        iconType = 'success';
+    } else if (estado === 'pendiente') {
+        iconType = 'warning';
+    }
+
+    Swal.fire({
+      position: 'center',
+      icon: iconType,
+      title: `Estado del Plan: ${estadoTexto}`,
+      showConfirmButton: false,
+      timer: 1500
+    });
   }
 
   function limpiarPaciente() {
@@ -222,9 +233,28 @@
       });
   }
 
+  function formatDateTime(dateTimeStr) {
+    if (!dateTimeStr) return "";
+    const date = new Date(dateTimeStr);
+    if (isNaN(date)) return dateTimeStr;
+
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+
+    let hours = date.getHours();
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const ampm = hours >= 12 ? 'pm' : 'am';
+    hours = hours % 12;
+    hours = hours ? hours : 12; // the hour '0' should be '12'
+    const strTime = String(hours).padStart(2, '0') + ':' + minutes + ' ' + ampm;
+
+    return `${day}-${month}-${year} ${strTime}`;
+  }
+
   function cargarProcesos() {
     tablaProcesos.html(
-      '<tr><td colspan="7" class="text-center text-muted">Cargando...</td></tr>'
+      '<tr><td colspan="5" class="text-center text-muted">Cargando...</td></tr>'
     );
     api("api/atencion_listar_procesos.php", {}, "GET")
       .done((resp) => {
@@ -233,41 +263,32 @@
           const rows = _procesosCache.map(
             (p) =>
               "<tr>" +
-              "<td>" +
-              p.id +
-              "</td><td>" +
-              p.paciente +
-              "</td><td>" +
-              p.motivo +
-              "</td><td>" +
-              p.urgencia +
-              "</td><td>" +
-              p.estado +
-              "</td><td>" +
-              p.creado +
-              "</td>" +
-              "<td>" +
+              "<td>" + p.id + "</td>" +
+              "<td>" + p.paciente + "</td>" +
+              "<td>" + p.estado + "</td>" +
+              "<td>" + formatDateTime(p.creado) + "</td>" +
+              '<td class="text-center">' +
               (p.estado === "abierto"
-                ? '<button class="btn btn-xs btn-outline-danger btn-cerrar" data-id="' +
-                  p.id +
-                  '"><i class="fas fa-times"></i></button>'
+                ? '<button class="btn btn-xs btn-outline-danger btn-cerrar" data-id="' + p.id + '">' +
+                  '<i class="fas fa-trash-alt"></i>' +
+                  '</button>'
                 : "-") +
               "</td>" +
               "</tr>"
           );
           tablaProcesos.html(
             rows.join("") ||
-              '<tr><td colspan="7" class="text-center text-muted">Sin procesos</td></tr>'
+              '<tr><td colspan="5" class="text-center text-muted">Sin procesos</td></tr>'
           );
         } else {
           tablaProcesos.html(
-            '<tr><td colspan="7" class="text-center text-danger">Error</td></tr>'
+            '<tr><td colspan="5" class="text-center text-danger">Error</td></tr>'
           );
         }
       })
       .fail(() =>
         tablaProcesos.html(
-          '<tr><td colspan="7" class="text-center text-danger">Error</td></tr>'
+          '<tr><td colspan="5" class="text-center text-danger">Error</td></tr>'
         )
       );
   }
@@ -275,28 +296,28 @@
   function abrirProceso() {
     const id_paciente = selPaciente.val();
     if (!id_paciente) return;
-    const motivo = txtMotivo.val().trim();
-    const urgencia = selUrgencia.val();
-    const obs = txtObs.val().trim();
-    if (!motivo || !urgencia) {
-      lblProcesoMsg.text("Complete motivo y urgencia").addClass("text-danger");
-      return;
-    }
+
+    const p = _pacientesCache.find((x) => x.id == id_paciente);
+
+    const obs = (txtObs.val() || "").trim();
     btnAbrir.prop("disabled", true);
     lblProcesoMsg.removeClass("text-danger text-success").text("Guardando...");
     api("api/atencion_crear_proceso.php", {
       id_paciente,
-      motivo,
-      urgencia,
       obs,
+      suscripcion_id: p ? p.suscripcion_id : null,
+      plan_id: p ? p.plan_id : null,
     })
       .done((resp) => {
         if (resp.status === "ok") {
-          lblProcesoMsg
-            .text("Proceso abierto ID " + resp.id)
-            .addClass("text-success");
-          txtMotivo.val("");
-          selUrgencia.val("");
+          Swal.fire({
+            icon: 'success',
+            title: 'Proceso Abierto',
+            text: 'El proceso de atención ha sido abierto con el ID ' + resp.id,
+            timer: 2000,
+            showConfirmButton: false
+          });
+          lblProcesoMsg.text(""); // Limpiar el label de mensaje
           txtObs.val("");
           cargarProcesos();
         } else {
@@ -314,13 +335,43 @@
   btnAbrir.on("click", abrirProceso);
   tablaProcesos.on("click", ".btn-cerrar", function () {
     const id = $(this).data("id");
-    if (!confirm("¿Cerrar proceso " + id + "?")) return;
-    api("api/atencion_cerrar_proceso.php", { id })
-      .done((resp) => {
-        if (resp.status === "ok") cargarProcesos();
-        else alert(resp.message || "Error");
-      })
-      .fail(() => alert("Error de conexión"));
+    Swal.fire({
+      title: '¿Estás seguro?',
+      text: "Esta acción cerrará el proceso de atención #" + id,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Sí, ¡Cerrar!',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        api("api/atencion_cerrar_proceso.php", { id })
+          .done((resp) => {
+            if (resp.status === "ok") {
+              Swal.fire(
+                'Cerrado',
+                'El proceso ha sido cerrado con éxito.',
+                'success'
+              );
+              cargarProcesos();
+            } else {
+              Swal.fire(
+                'Error',
+                resp.message || 'No se pudo cerrar el proceso.',
+                'error'
+              );
+            }
+          })
+          .fail(() => {
+            Swal.fire(
+              'Error de Conexión',
+              'No se pudo comunicar con el servidor.',
+              'error'
+            );
+          });
+      }
+    });
   });
 
   // Init

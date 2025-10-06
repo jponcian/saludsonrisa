@@ -11,7 +11,7 @@
  Target Server Version : 80300
  File Encoding         : 65001
 
- Date: 01/10/2025 22:39:57
+ Date: 05/10/2025 23:48:48
 */
 
 SET NAMES utf8mb4;
@@ -31,7 +31,7 @@ CREATE TABLE `atencion_eventos`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_proceso`(`proceso_id`) USING BTREE,
   INDEX `idx_tipo`(`tipo`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of atencion_eventos
@@ -62,11 +62,12 @@ CREATE TABLE `atencion_procesos`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_paciente`(`paciente_id`) USING BTREE,
   INDEX `idx_estado`(`estado`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of atencion_procesos
 -- ----------------------------
+INSERT INTO `atencion_procesos` VALUES (3, 1, NULL, NULL, 'APERTURA ADMIN', '', 'Observaciones', 'abierto', 'guardia', 0, NULL, NULL, NULL, NULL, '2025-10-05 22:52:06', NULL, '2025-10-05 22:52:06');
 
 -- ----------------------------
 -- Table structure for consulta_especialidades
@@ -76,7 +77,7 @@ CREATE TABLE `consulta_especialidades`  (
   `consulta_id` int NOT NULL,
   `especialidad_id` int NOT NULL,
   PRIMARY KEY (`consulta_id`, `especialidad_id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Fixed;
+) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = FIXED;
 
 -- ----------------------------
 -- Records of consulta_especialidades
@@ -92,7 +93,7 @@ CREATE TABLE `consulta_fotos`  (
   `foto_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `consulta_id`(`consulta_id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of consulta_fotos
@@ -117,7 +118,7 @@ CREATE TABLE `consultas`  (
   INDEX `paciente_id`(`paciente_id`) USING BTREE,
   INDEX `especialista_id`(`especialista_id`) USING BTREE,
   INDEX `idx_consulta_proceso`(`proceso_id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 18 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 18 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of consultas
@@ -135,7 +136,7 @@ CREATE TABLE `demo_asistencias`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `id_participante`(`id_participante`) USING BTREE,
   INDEX `id_reunion`(`id_reunion`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Fixed;
+) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = FIXED;
 
 -- ----------------------------
 -- Records of demo_asistencias
@@ -152,7 +153,7 @@ CREATE TABLE `demo_participantes`  (
   `token` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `id_reunion`(`id_reunion`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of demo_participantes
@@ -168,7 +169,7 @@ CREATE TABLE `demo_reuniones`  (
   `fecha` date NOT NULL,
   `hora` time NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of demo_reuniones
@@ -184,7 +185,7 @@ CREATE TABLE `empresas`  (
   `contacto` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
   `notas` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of empresas
@@ -199,7 +200,7 @@ CREATE TABLE `especialidades`  (
   `id` int NOT NULL AUTO_INCREMENT,
   `nombre` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 28 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 28 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of especialidades
@@ -241,7 +242,7 @@ CREATE TABLE `especialista_especialidades`  (
   `especialidad_id` int NOT NULL,
   PRIMARY KEY (`especialista_id`, `especialidad_id`) USING BTREE,
   INDEX `especialidad_id`(`especialidad_id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Fixed;
+) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = FIXED;
 
 -- ----------------------------
 -- Records of especialista_especialidades
@@ -270,7 +271,7 @@ CREATE TABLE `especialistas`  (
   `usuario_id` int NOT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `usuario_id`(`usuario_id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 15 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Fixed;
+) ENGINE = MyISAM AUTO_INCREMENT = 15 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = FIXED;
 
 -- ----------------------------
 -- Records of especialistas
@@ -305,7 +306,7 @@ CREATE TABLE `pacientes`  (
   `empresa_id` int NULL DEFAULT NULL,
   `somos` tinyint(1) NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 13 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 13 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of pacientes
@@ -336,14 +337,15 @@ CREATE TABLE `plan_pagos`  (
   INDEX `idx_plan_pagos_paciente`(`paciente_id`) USING BTREE,
   INDEX `idx_plan_pagos_plan`(`plan_id`) USING BTREE,
   INDEX `idx_plan_pagos_tipo`(`tipo_pago`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of plan_pagos
 -- ----------------------------
-INSERT INTO `plan_pagos` VALUES (1, 1, 2, 'inscripcion', 20.00, '2025-10-02', '', NULL, NULL, '2025-10-01 22:00:32');
-INSERT INTO `plan_pagos` VALUES (2, 1, 2, 'inscripcion', 100.00, '2025-10-02', '', NULL, NULL, '2025-10-01 22:28:03');
-INSERT INTO `plan_pagos` VALUES (3, 1, 2, 'mensualidad', 40.00, '2025-10-02', '0202523', NULL, NULL, '2025-10-01 22:29:56');
+INSERT INTO `plan_pagos` VALUES (1, 1, 2, 'inscripcion', 20.00, '2025-08-15', '', NULL, NULL, '2025-10-01 22:00:32');
+INSERT INTO `plan_pagos` VALUES (2, 1, 2, 'inscripcion', 100.00, '2025-08-15', '', NULL, NULL, '2025-10-01 22:28:03');
+INSERT INTO `plan_pagos` VALUES (3, 1, 2, 'mensualidad', 40.00, '2025-08-15', '0202523', NULL, NULL, '2025-10-01 22:29:56');
+INSERT INTO `plan_pagos` VALUES (4, 6, 3, 'inscripcion', 60.00, '2025-10-06', '50502', NULL, NULL, '2025-10-05 23:41:29');
 
 -- ----------------------------
 -- Table structure for plan_suscripciones
@@ -369,12 +371,13 @@ CREATE TABLE `plan_suscripciones`  (
   INDEX `idx_plan`(`plan_id`) USING BTREE,
   INDEX `idx_estado`(`estado`) USING BTREE,
   INDEX `idx_activo`(`activo`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of plan_suscripciones
 -- ----------------------------
 INSERT INTO `plan_suscripciones` VALUES (2, 1, 2, NULL, '2025-10-01', '2025-11-15', 45, 'pendiente', 1, 40.00, 120.00, '', '2025-10-01 21:46:23', '2025-10-01 21:46:23');
+INSERT INTO `plan_suscripciones` VALUES (3, 6, 3, NULL, '2025-10-05', '2025-11-19', 45, 'pendiente', 1, 20.00, 60.00, '', '2025-10-05 23:41:22', '2025-10-05 23:41:22');
 
 -- ----------------------------
 -- Table structure for plan_suscripciones_historial
@@ -400,7 +403,7 @@ CREATE TABLE `plan_suscripciones_historial`  (
   INDEX `idx_plan`(`plan_id`) USING BTREE,
   INDEX `idx_estado`(`estado`) USING BTREE,
   INDEX `idx_activo`(`activo`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of plan_suscripciones_historial
@@ -420,7 +423,7 @@ CREATE TABLE `planes`  (
   `costo_mensual` decimal(10, 2) NULL DEFAULT 0.00,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `empresa_id`(`empresa_id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of planes
@@ -441,7 +444,7 @@ CREATE TABLE `planes_limites`  (
   `plan_salud` int NULL DEFAULT 0,
   `fecha_actualizacion` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 16 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 16 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of planes_limites
@@ -477,7 +480,7 @@ CREATE TABLE `servicios_consumidos`  (
   `estado` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
   `codigo_limite` varchar(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of servicios_consumidos
@@ -498,7 +501,7 @@ CREATE TABLE `usuarios`  (
   `fecha_creacion` datetime NULL DEFAULT NULL,
   `foto` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 16 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 16 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of usuarios

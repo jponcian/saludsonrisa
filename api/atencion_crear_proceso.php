@@ -8,9 +8,16 @@ if ($rol !== 'admin_usuarios') {
     exit;
 }
 $id_paciente = isset($_POST['id_paciente']) ? (int)$_POST['id_paciente'] : 0;
-$motivo = trim($_POST['motivo'] ?? '');
-$urgencia = trim($_POST['urgencia'] ?? '');
+if ($rol === 'admin_usuarios') {
+    $motivo = 'APERTURA ADMIN';
+    $urgencia = 'programada';
+} else {
+    $motivo = trim($_POST['motivo'] ?? '');
+    $urgencia = trim($_POST['urgencia'] ?? '');
+}
+
 $obs = trim($_POST['obs'] ?? '');
+
 if (!$id_paciente || $motivo === '' || $urgencia === '') {
     echo json_encode(['status' => 'error', 'message' => 'Datos incompletos']);
     exit;

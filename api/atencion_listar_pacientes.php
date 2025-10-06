@@ -59,6 +59,8 @@ try {
     $select[] = $colCedula ? "p.$colCedula AS documento" : "'' AS documento";
     $select[] = 'pl.nombre AS plan_nombre';
     $select[] = 'pl.clave AS plan_clave';
+    $select[] = 'ps.id AS suscripcion_id';
+    $select[] = 'ps.plan_id AS plan_id';
     $select[] = "(SELECT MIN(pp.fecha_pago) FROM plan_pagos pp WHERE pp.paciente_id = p.id AND pp.tipo_pago IN ('inscripcion', 'inscripcion_diferencia')) AS fecha_inscripcion";
     // cobertura inicio = fecha del primer pago de mensualidad + 45 días si existe
     $select[] = "(SELECT DATE_ADD(MIN(pp.fecha_pago), INTERVAL 45 DAY) FROM plan_pagos pp WHERE pp.paciente_id = p.id AND pp.tipo_pago = 'mensualidad') AS fecha_inicio_cobertura";
