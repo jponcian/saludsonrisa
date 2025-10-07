@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
     <link rel="stylesheet" href="dist/css/adminlte.min.css">
     <link rel="stylesheet" href="css/custom.css">
+    <link rel="stylesheet" href="plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css">
 </head>
 
 <body class="hold-transition sidebar-mini">
@@ -82,23 +83,37 @@
                         </div>
                     </div>
 
-                    <div class="card card-info card-outline">
-                        <div class="card-header p-2">
-                            <strong>2. Historial del Paciente</strong>
+                    <div class="row">
+                        <div class="col-md-7">
+                            <div class="card card-info card-outline">
+                                <div class="card-header p-2">
+                                    <strong>2. Historial del Paciente</strong>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive" style="max-height:260px;overflow:auto;">
+                                        <table class="table table-sm table-hover" id="tablaHistorialPaciente">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th>Fecha</th>
+                                                    <th>Tipo</th>
+                                                    <th>Detalle</th>
+                                                    <th>Especialista</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="card-body">
-                            <div class="table-responsive" style="max-height:260px;overflow:auto;">
-                                <table class="table table-sm table-hover" id="tablaHistorialPaciente">
-                                    <thead class="thead-light">
-                                        <tr>
-                                            <th>Fecha</th>
-                                            <th>Tipo</th>
-                                            <th>Detalle</th>
-                                            <th>Especialista</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody></tbody>
-                                </table>
+                        <div class="col-md-5">
+                            <div class="card card-warning card-outline">
+                                <div class="card-header p-2">
+                                    <strong>Resumen de Cobertura del Plan</strong>
+                                </div>
+                                <div id="resumen-plan-paciente" class="card-body" style="max-height:325px;overflow:auto;">
+                                    <p class="text-muted text-center">Seleccione un proceso para ver la cobertura.</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -144,6 +159,7 @@
     <script src="js/modal_cambiar_contrasena.js"></script>
     <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="dist/js/adminlte.min.js"></script>
+    <script src="plugins/sweetalert2/sweetalert2.min.js"></script>
     <script src="js/atencion_especialista.js"></script>
 </body>
 

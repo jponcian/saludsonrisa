@@ -102,11 +102,15 @@ if (isset($_FILES['foto']) && $_FILES['foto']['error'] == 0) {
 }
 
 try {
-    $sql = "INSERT INTO pacientes (nombres, apellidos, cedula, fecha_nacimiento, genero, telefono, direccion, foto_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO pacientes (nombres, apellidos, cedula, fecha_nacimiento, genero, telefono, email, direccion, foto_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmt = $pdo->prepare($sql);
-    $stmt->execute([$nombres, $apellidos, $cedula, $fecha_nacimiento, $genero, $telefono, $direccion, $foto_url]);
+    $stmt->execute([$nombres, $apellidos, $cedula, $fecha_nacimiento, $genero, $telefono, $email, $direccion, $foto_url]);
 
-    $response = ['status' => 'success', 'message' => 'Paciente registrado con éxito.'];
+    $response = [
+        'status' => 'success',
+        'message' => 'Paciente registrado con éxito.',
+        'id' => (int)$pdo->lastInsertId()
+    ];
 } catch (\PDOException $e) {
     log_error('Error al registrar el paciente en la DB: ' . $e->getMessage());
     $response['message'] = 'Error al registrar el paciente: ' . $e->getMessage();

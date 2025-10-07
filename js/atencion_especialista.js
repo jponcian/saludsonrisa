@@ -6,11 +6,11 @@
   const txtCoberturaE = $("#txtCoberturaE");
   const txtEstadoProcesoE = $("#txtEstadoProcesoE");
   const tablaHistorial = $("#tablaHistorialPaciente tbody");
+  const divResumenPlan = $("#resumen-plan-paciente");
   const txtDiagnostico = $("#txtDiagnostico");
   const txtProcedimiento = $("#txtProcedimiento");
   const txtIndicaciones = $("#txtIndicaciones");
   const btnGuardar = $("#btnGuardarConsulta");
-  const lblConsultaMsg = $("#lblConsultaMsg");
 
   let _procesos = [];
   let _pacienteActual = null;
@@ -49,13 +49,14 @@
       limpiarProceso();
       return;
     }
-    _pacienteActual = pr.id_paciente;
+    _pacienteActual = pr.paciente_id;
     txtPacienteNombre.val(pr.paciente || "");
     txtPlanE.val(pr.plan || "");
     txtCoberturaE.val(pr.cobertura || "");
     txtEstadoProcesoE.val(pr.estado || "");
     btnGuardar.prop("disabled", false);
-    cargarHistorial(pr.id_paciente);
+    cargarHistorial(pr.paciente_id);
+    cargarResumenPlan(pr.paciente_id, pr.plan);
   }
 
   function limpiarProceso() {
@@ -65,6 +66,9 @@
     txtCoberturaE.val("");
     txtEstadoProcesoE.val("");
     tablaHistorial.empty();
+    divResumenPlan.html(
+      '<p class="text-muted text-center">Seleccione un proceso para ver la cobertura.</p>'
+    );
     btnGuardar.prop("disabled", true);
   }
 
@@ -108,36 +112,126 @@
       );
   }
 
+  function cargarResumenPlan(idPaciente, planNombre) {
+    if (!idPaciente) {
+      divResumenPlan.html(
+        '<p class="text-warning text-center">No se pudo determinar el paciente para el plan seleccionado.</p>'
+      );
+      return;
+    }
+
+    divResumenPlan.html(
+      '<p class="text-muted text-center">Cargando resumen...</p>'
+    );
+    api("api/atencion_resumen_consumos.php", { id_paciente: idPaciente }, "GET")
+      .done((resp) => {
+        if (resp.status !== "ok" || !resp.kpis) {
+          divResumenPlan.html(
+            '<p class="text-danger text-center">Error al cargar resumen.</p>'
+          );
+          return;
+        }
+        if (!resp.kpis.length) {
+          divResumenPlan.html(
+            `<h6 class='text-center'>Plan: <strong>${
+              planNombre || "N/A"
+            }</strong></h6><p class='text-muted text-center mt-3'>Este plan no tiene cobertura de servicios por cantidad.</p>`
+          );
+          return;
+        }
+
+        let html = `<h6 class='text-center'>Plan: <strong>${
+          planNombre || "N/A"
+        }</strong></h6>`;
+        resp.kpis.forEach((kpi) => {
+          const perc = kpi.max > 0 ? (kpi.usado / kpi.max) * 100 : 0;
+          let color = "bg-success";
+          if (perc >= 50) color = "bg-warning";
+          if (perc >= 90) color = "bg-danger";
+
+          html += `
+                <div class="progress-group">
+                    ${kpi.nombre}
+                    <span class="float-right"><b>${kpi.usado}</b>/${kpi.max}</span>
+                    <div class="progress progress-sm">
+                        <div class="progress-bar ${color}" style="width: ${perc}%"></div>
+                    </div>
+                </div>`;
+        });
+        divResumenPlan.html(html);
+      })
+      .fail(() => {
+        divResumenPlan.html(
+          '<p class="text-danger text-center">Error al cargar resumen.</p>'
+        );
+      });
+  }
+
   function guardarConsulta() {
-    if (!_pacienteActual) return;
+    const procesoId = selProceso.val();
     const diagnostico = txtDiagnostico.val().trim();
     const procedimiento = txtProcedimiento.val().trim();
     const indicaciones = txtIndicaciones.val().trim();
+    if (!procesoId) {
+      Swal.fire({
+        icon: "warning",
+        title: "No hay proceso seleccionado",
+        text: "Debes seleccionar un proceso abierto antes de guardar la consulta.",
+      });
+      return;
+    }
+
+    const proceso = _procesos.find((x) => String(x.id) === String(procesoId));
+    if (!proceso) {
+      Swal.fire({
+        icon: "error",
+        title: "Proceso no encontrado",
+        text: "El proceso seleccionado ya no está disponible. Recarga la lista e inténtalo nuevamente.",
+      });
+      limpiarProceso();
+      cargarProcesos();
+      return;
+    }
+
     if (!diagnostico) {
-      lblConsultaMsg.text("Diagnóstico requerido").addClass("text-danger");
+      Swal.fire(
+        "Dato Requerido",
+        "El campo diagnóstico es obligatorio.",
+        "warning"
+      );
       return;
     }
     btnGuardar.prop("disabled", true);
-    lblConsultaMsg.removeClass("text-danger text-success").text("Guardando...");
+
     api("api/atencion_registrar_consulta.php", {
-      id_paciente: _pacienteActual,
+      id_paciente: proceso.paciente_id,
+      proceso_id: procesoId,
       diagnostico,
       procedimiento,
       indicaciones,
     })
       .done((resp) => {
         if (resp.status === "ok") {
-          lblConsultaMsg.text("Consulta registrada").addClass("text-success");
+          Swal.fire("Éxito", resp.message, "success");
           txtDiagnostico.val("");
           txtProcedimiento.val("");
           txtIndicaciones.val("");
-          cargarHistorial(_pacienteActual);
+          cargarHistorial(proceso.paciente_id);
+          cargarResumenPlan(proceso.paciente_id, txtPlanE.val()); // Recargar resumen
         } else {
-          lblConsultaMsg.text(resp.message || "Error").addClass("text-danger");
+          Swal.fire(
+            "Error",
+            resp.message || "Ocurrió un error no especificado",
+            "error"
+          );
         }
       })
       .fail(() =>
-        lblConsultaMsg.text("Error de conexión").addClass("text-danger")
+        Swal.fire(
+          "Error de Conexión",
+          "No se pudo comunicar con el servidor.",
+          "error"
+        )
       )
       .always(() => btnGuardar.prop("disabled", false));
   }

@@ -533,6 +533,7 @@ if ($rol === 'especialista') {
                 var patientData = JSON.stringify(row);
                 // var html = "<button class='btn btn-success btn-sm btn-crear-consulta' data-paciente='" + patientData + "'>Crear Consulta</button> " +
                 var html = "<button class='btn btn-info btn-sm btn-ver-paciente' data-id='" + row.id + "' data-toggle='tooltip' data-placement='top' title='Ver paciente'><i class='fas fa-eye'></i></button> " +
+                  "<a class='btn btn-secondary btn-sm btn-historia-clinica' href='app_historia_clinica.php?id=" + row.id + "' data-toggle='tooltip' data-placement='top' title='Historia clínica'><i class='fas fa-notes-medical'></i></a> " +
                   "<button class='btn btn-warning btn-sm btn-editar-paciente' data-paciente='" + patientData + "' data-toggle='tooltip' data-placement='top' title='Editar paciente'><i class='fas fa-edit'></i></button>";
                 if (usuarioRol !== 'Estandar') {
                   html += " <button class='btn btn-danger btn-sm btn-eliminar-paciente' data-id='" + row.id + "' data-toggle='tooltip' data-placement='top' title='Eliminar paciente'><i class='fas fa-trash'></i></button>";
@@ -584,16 +585,24 @@ if ($rol === 'especialista') {
                 if (typeof tablaPacientes !== 'undefined' && tablaPacientes.ajax) {
                   tablaPacientes.ajax.reload(null, false);
                 }
+                var nuevoPacienteId = response && response.id ? parseInt(response.id, 10) : null;
                 if (window.Swal) {
                   Swal.fire({
                     icon: 'success',
                     title: '¡Paciente Registrado!',
                     text: response.message || 'Registro exitoso.',
-                    confirmButtonText: 'OK',
+                    showCancelButton: !!nuevoPacienteId,
+                    confirmButtonText: nuevoPacienteId ? 'Completar historia clínica' : 'OK',
+                    cancelButtonText: 'Cerrar',
                     customClass: {
-                      confirmButton: 'btn btn-success'
+                      confirmButton: 'btn btn-success',
+                      cancelButton: 'btn btn-secondary'
                     },
                     buttonsStyling: false
+                  }).then(function(result) {
+                    if (nuevoPacienteId && result.isConfirmed) {
+                      window.location.href = 'app_historia_clinica.php?id=' + nuevoPacienteId;
+                    }
                   });
                 } else {
                   alert(response.message || 'Paciente registrado.');

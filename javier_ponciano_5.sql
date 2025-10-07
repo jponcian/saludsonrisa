@@ -11,7 +11,7 @@
  Target Server Version : 80300
  File Encoding         : 65001
 
- Date: 05/10/2025 23:48:48
+ Date: 06/10/2025 20:08:03
 */
 
 SET NAMES utf8mb4;
@@ -559,5 +559,77 @@ CREATE ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `vw_paciente_limites` AS 
 -- ----------------------------
 DROP VIEW IF EXISTS `vw_suscripciones_estado`;
 CREATE ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `vw_suscripciones_estado` AS select `ps`.`id` AS `id`,`ps`.`paciente_id` AS `paciente_id`,`ps`.`plan_id` AS `plan_id`,(to_days(`ps`.`cobertura_inicio`) - to_days(curdate())) AS `dias_para_cobertura`,(case when ((`ps`.`cobertura_inicio` is not null) and (`ps`.`cobertura_inicio` <= curdate()) and (`ps`.`estado` in ('pendiente','espera'))) then 'activa_pendiente_marcar' else `ps`.`estado` end) AS `estado_calculado` from `plan_suscripciones` `ps` where (`ps`.`activo` = 1);
+
+-- ----------------------------
+-- Table structure for historia_secciones
+-- ----------------------------
+DROP TABLE IF EXISTS `historia_secciones`;
+CREATE TABLE `historia_secciones`  (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(120) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `descripcion` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `orden` int NOT NULL DEFAULT 0,
+  `activo` tinyint(1) NOT NULL DEFAULT 1,
+  `creado_en` datetime NULL DEFAULT CURRENT_TIMESTAMP,
+  `actualizado_en` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_historia_secciones_orden`(`orden`) USING BTREE,
+  INDEX `idx_historia_secciones_activo`(`activo`) USING BTREE
+) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Table structure for historia_preguntas
+-- ----------------------------
+DROP TABLE IF EXISTS `historia_preguntas`;
+CREATE TABLE `historia_preguntas`  (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `seccion_id` int NOT NULL,
+  `pregunta` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `tipo` enum('texto_corto','texto_largo','numero','fecha','si_no','seleccion_unica','seleccion_multiple') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'texto_corto',
+  `opciones` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL,
+  `ayuda` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `requerida` tinyint(1) NOT NULL DEFAULT 0,
+  `orden` int NOT NULL DEFAULT 0,
+  `activo` tinyint(1) NOT NULL DEFAULT 1,
+  `creado_en` datetime NULL DEFAULT CURRENT_TIMESTAMP,
+  `actualizado_en` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_historia_preguntas_seccion`(`seccion_id`) USING BTREE,
+  INDEX `idx_historia_preguntas_activo`(`activo`) USING BTREE,
+  INDEX `idx_historia_preguntas_tipo`(`tipo`) USING BTREE
+) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Table structure for historia_respuestas
+-- ----------------------------
+DROP TABLE IF EXISTS `historia_respuestas`;
+CREATE TABLE `historia_respuestas`  (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `paciente_id` int NOT NULL,
+  `pregunta_id` int NOT NULL,
+  `respuesta` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL,
+  `respondido_por` int NULL DEFAULT NULL,
+  `respondido_en` datetime NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_historia_respuestas_paciente`(`paciente_id`) USING BTREE,
+  INDEX `idx_historia_respuestas_pregunta`(`pregunta_id`) USING BTREE,
+  UNIQUE INDEX `idx_historia_respuestas_unica`(`paciente_id`, `pregunta_id`) USING BTREE,
+  INDEX `idx_historia_respuestas_por`(`respondido_por`) USING BTREE
+) ENGINE = MyISAM AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Table structure for historia_paciente_estados
+-- ----------------------------
+DROP TABLE IF EXISTS `historia_paciente_estados`;
+CREATE TABLE `historia_paciente_estados`  (
+  `paciente_id` int NOT NULL,
+  `estado` enum('pendiente','en_progreso','completado') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'pendiente',
+  `ultima_actualizacion` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `completado_por` int NULL DEFAULT NULL,
+  `completado_en` datetime NULL DEFAULT NULL,
+  PRIMARY KEY (`paciente_id`) USING BTREE,
+  INDEX `idx_historia_estado_estado`(`estado`) USING BTREE,
+  INDEX `idx_historia_estado_completado`(`completado_en`) USING BTREE
+) ENGINE = MyISAM CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 SET FOREIGN_KEY_CHECKS = 1;

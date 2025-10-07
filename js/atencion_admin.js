@@ -115,19 +115,19 @@
     else btnAbrir.prop("disabled", true);
     cargarConsumos(id);
 
-    let iconType = 'info';
-    if (estado === 'activo') {
-        iconType = 'success';
-    } else if (estado === 'pendiente') {
-        iconType = 'warning';
+    let iconType = "info";
+    if (estado === "activo") {
+      iconType = "success";
+    } else if (estado === "pendiente") {
+      iconType = "warning";
     }
 
     Swal.fire({
-      position: 'center',
+      position: "center",
       icon: iconType,
       title: `Estado del Plan: ${estadoTexto}`,
       showConfirmButton: false,
-      timer: 1500
+      timer: 1500,
     });
   }
 
@@ -244,10 +244,10 @@
 
     let hours = date.getHours();
     const minutes = String(date.getMinutes()).padStart(2, "0");
-    const ampm = hours >= 12 ? 'pm' : 'am';
+    const ampm = hours >= 12 ? "pm" : "am";
     hours = hours % 12;
     hours = hours ? hours : 12; // the hour '0' should be '12'
-    const strTime = String(hours).padStart(2, '0') + ':' + minutes + ' ' + ampm;
+    const strTime = String(hours).padStart(2, "0") + ":" + minutes + " " + ampm;
 
     return `${day}-${month}-${year} ${strTime}`;
   }
@@ -263,15 +263,29 @@
           const rows = _procesosCache.map(
             (p) =>
               "<tr>" +
-              "<td>" + p.id + "</td>" +
-              "<td>" + p.paciente + "</td>" +
-              "<td>" + p.estado + "</td>" +
-              "<td>" + formatDateTime(p.creado) + "</td>" +
+              "<td>" +
+              p.id +
+              "</td>" +
+              "<td>" +
+              p.paciente +
+              "</td>" +
+              "<td>" +
+              p.estado +
+              "</td>" +
+              "<td>" +
+              formatDateTime(p.creado) +
+              "</td>" +
               '<td class="text-center">' +
               (p.estado === "abierto"
-                ? '<button class="btn btn-xs btn-outline-danger btn-cerrar" data-id="' + p.id + '">' +
+                ? '<button class="btn btn-sm btn-primary btn-procesar mr-1" data-id="' +
+                  p.id +
+                  '">' +
+                  '<i class="fas fa-play"></i> Procesar</button>' +
+                  '<button class="btn btn-xs btn-outline-danger btn-cerrar" data-id="' +
+                  p.id +
+                  '">' +
                   '<i class="fas fa-trash-alt"></i>' +
-                  '</button>'
+                  "</button>"
                 : "-") +
               "</td>" +
               "</tr>"
@@ -308,27 +322,27 @@
       .done((resp) => {
         if (resp.status === "ok") {
           Swal.fire({
-            icon: 'success',
-            title: 'Proceso Abierto',
-            text: 'El proceso de atención ha sido abierto con el ID ' + resp.id,
+            icon: "success",
+            title: "Proceso Abierto",
+            text: "El proceso de atención ha sido abierto con el ID " + resp.id,
             timer: 2000,
-            showConfirmButton: false
+            showConfirmButton: false,
           });
           txtObs.val("");
           cargarProcesos();
         } else {
           Swal.fire({
-            icon: 'error',
-            title: 'Error al Abrir Proceso',
-            text: resp.message || 'Ocurrió un error inesperado.'
+            icon: "error",
+            title: "Error al Abrir Proceso",
+            text: resp.message || "Ocurrió un error inesperado.",
           });
         }
       })
       .fail(() => {
         Swal.fire({
-          icon: 'error',
-          title: 'Error de Conexión',
-          text: 'No se pudo comunicar con el servidor.'
+          icon: "error",
+          title: "Error de Conexión",
+          text: "No se pudo comunicar con el servidor.",
         });
       })
       .always(() => btnAbrir.prop("disabled", false));
@@ -340,41 +354,56 @@
   tablaProcesos.on("click", ".btn-cerrar", function () {
     const id = $(this).data("id");
     Swal.fire({
-      title: '¿Estás seguro?',
-      text: "Esta acción cerrará el proceso de atención #" + id,
-      icon: 'warning',
+      title: "¿Estás seguro?",
+      text:
+        "Esta acción eliminará permanentemente el proceso de atención #" + id,
+      icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
-      confirmButtonText: 'Sí, ¡Cerrar!',
-      cancelButtonText: 'Cancelar'
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
     }).then((result) => {
       if (result.isConfirmed) {
-        api("api/atencion_cerrar_proceso.php", { id })
+        api("api/atencion_eliminar_proceso.php", { id })
           .done((resp) => {
             if (resp.status === "ok") {
               Swal.fire(
-                'Cerrado',
-                'El proceso ha sido cerrado con éxito.',
-                'success'
+                "Eliminado",
+                "El proceso ha sido eliminado con éxito.",
+                "success"
               );
               cargarProcesos();
             } else {
               Swal.fire(
-                'Error',
-                resp.message || 'No se pudo cerrar el proceso.',
-                'error'
+                "Error",
+                resp.message || "No se pudo eliminar el proceso.",
+                "error"
               );
             }
           })
           .fail(() => {
             Swal.fire(
-              'Error de Conexión',
-              'No se pudo comunicar con el servidor.',
-              'error'
+              "Error de Conexión",
+              "No se pudo comunicar con el servidor.",
+              "error"
             );
           });
       }
+    });
+  });
+
+  // Handler placeholder para 'Procesar' — por ahora no realiza cambios
+  tablaProcesos.on("click", ".btn-procesar", function () {
+    const id = $(this).data("id");
+    console.log("Procesar (placeholder) proceso id:", id);
+    Swal.fire({
+      icon: "info",
+      title: "Procesar",
+      text:
+        "Funcionalidad de procesar activada (placeholder) para proceso #" + id,
+      timer: 1500,
+      showConfirmButton: false,
     });
   });
 
