@@ -149,15 +149,67 @@
           input.appendChild(crearOpcion(opt));
         });
         break;
-      case "seleccion_multiple":
-        input = document.createElement("select");
-        input.className = "form-control";
-        input.id = labelId;
-        input.multiple = true;
+      case "seleccion_multiple": {
+        const contenedor = document.createElement("div");
+        contenedor.className = "historia-multiopciones";
+        contenedor.id = labelId;
         (pregunta.opciones || []).forEach((opt, index) => {
-          input.appendChild(crearOpcion(opt, index, true));
+          const checkboxId = `${labelId}-${index}`;
+          const item = document.createElement("div");
+          item.className = "custom-control custom-checkbox";
+
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.className = "custom-control-input";
+          checkbox.id = checkboxId;
+          checkbox.value = opt.value;
+          checkbox.dataset.checkboxPregunta = String(pregunta.id);
+          if (Array.isArray(valor) && valor.includes(opt.value)) {
+            checkbox.checked = true;
+          }
+
+          const checkboxLabel = document.createElement("label");
+          checkboxLabel.className = "custom-control-label";
+          checkboxLabel.setAttribute("for", checkboxId);
+          checkboxLabel.textContent = opt.label;
+
+          checkbox.addEventListener("change", () => {
+            const exclusivas = ["ninguna", "ninguno"];
+            const esExclusiva = exclusivas.includes(checkbox.value);
+            const checkboxes = contenedor.querySelectorAll(
+              `[data-checkbox-pregunta="${pregunta.id}"]`
+            );
+
+            if (esExclusiva && checkbox.checked) {
+              checkboxes.forEach((other) => {
+                if (other !== checkbox) {
+                  other.checked = false;
+                }
+              });
+            } else if (!esExclusiva && checkbox.checked) {
+              checkboxes.forEach((other) => {
+                if (other !== checkbox && exclusivas.includes(other.value)) {
+                  other.checked = false;
+                }
+              });
+            }
+          });
+
+          item.appendChild(checkbox);
+          item.appendChild(checkboxLabel);
+          contenedor.appendChild(item);
         });
+
+        if (!contenedor.childElementCount) {
+          const aviso = document.createElement("p");
+          aviso.className = "text-muted mb-0";
+          aviso.textContent = "No hay opciones disponibles.";
+          contenedor.appendChild(aviso);
+        }
+
+        input = contenedor;
         break;
+      }
       default:
         input = document.createElement("input");
         input.type = "text";
@@ -295,9 +347,15 @@
         return seleccionado ? seleccionado.value : null;
       }
       case "seleccion_multiple": {
-        const select = document.getElementById(`preg-${id}`);
-        if (!select) return [];
-        return Array.from(select.selectedOptions).map((opt) => opt.value);
+        const checkboxes = document.querySelectorAll(
+          `[data-checkbox-pregunta="${id}"]`
+        );
+        if (!checkboxes.length) {
+          return [];
+        }
+        return Array.from(checkboxes)
+          .filter((checkbox) => checkbox.checked)
+          .map((checkbox) => checkbox.value);
       }
       default: {
         const input = document.querySelector(`[data-input-pregunta="${id}"]`);

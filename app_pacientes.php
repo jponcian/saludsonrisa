@@ -531,9 +531,10 @@ if ($rol === 'especialista') {
               "data": null,
               render: function(data, type, row) {
                 var patientData = JSON.stringify(row);
+                var historiaBtnClass = (row.historia_estado === 'completado') ? 'btn btn-success btn-sm btn-historia-clinica' : 'btn btn-secondary btn-sm btn-historia-clinica';
                 // var html = "<button class='btn btn-success btn-sm btn-crear-consulta' data-paciente='" + patientData + "'>Crear Consulta</button> " +
                 var html = "<button class='btn btn-info btn-sm btn-ver-paciente' data-id='" + row.id + "' data-toggle='tooltip' data-placement='top' title='Ver paciente'><i class='fas fa-eye'></i></button> " +
-                  "<a class='btn btn-secondary btn-sm btn-historia-clinica' href='app_historia_clinica.php?id=" + row.id + "' data-toggle='tooltip' data-placement='top' title='Historia clínica'><i class='fas fa-notes-medical'></i></a> " +
+                  "<a class='" + historiaBtnClass + "' href='app_historia_clinica.php?id=" + row.id + "' data-toggle='tooltip' data-placement='top' title='Historia clínica'><i class='fas fa-notes-medical'></i></a> " +
                   "<button class='btn btn-warning btn-sm btn-editar-paciente' data-paciente='" + patientData + "' data-toggle='tooltip' data-placement='top' title='Editar paciente'><i class='fas fa-edit'></i></button>";
                 if (usuarioRol !== 'Estandar') {
                   html += " <button class='btn btn-danger btn-sm btn-eliminar-paciente' data-id='" + row.id + "' data-toggle='tooltip' data-placement='top' title='Eliminar paciente'><i class='fas fa-trash'></i></button>";

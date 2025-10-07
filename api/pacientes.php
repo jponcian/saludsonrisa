@@ -3,9 +3,13 @@ header('Content-Type: application/json');
 require 'conexion.php';
 
 try {
-    $stmt = $pdo->query("SELECT id, nombres, apellidos, cedula, fecha_nacimiento, genero, telefono, direccion, foto_url FROM pacientes ORDER BY id DESC");
-    $stmt = $pdo->query("SELECT id, nombres, apellidos, cedula, fecha_nacimiento, genero, telefono, email, direccion, foto_url FROM pacientes ORDER BY id DESC");
-    $pacientes = $stmt->fetchAll();
+    $sql = "SELECT p.id, p.nombres, p.apellidos, p.cedula, p.fecha_nacimiento, p.genero, p.telefono, p.email, p.direccion, p.foto_url, h.estado AS historia_estado
+            FROM pacientes p
+            LEFT JOIN historia_paciente_estados h ON h.paciente_id = p.id
+            ORDER BY p.id DESC";
+
+    $stmt = $pdo->query($sql);
+    $pacientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     echo json_encode([
         'data' => $pacientes
