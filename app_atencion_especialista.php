@@ -1,4 +1,17 @@
-<?php require_once 'api/auth_check.php'; ?>
+<?php
+require_once 'api/auth_check.php';
+require_once 'api/conexion.php';
+
+$paginaRuta = basename(__FILE__);
+$stmtPagina = $pdo->prepare('SELECT id FROM paginas WHERE ruta = ? LIMIT 1');
+$stmtPagina->execute([$paginaRuta]);
+$paginaId = $stmtPagina->fetchColumn();
+
+if (!$paginaId || !in_array((int) $paginaId, $permisos_usuario, true)) {
+    header('Location: app_inicio.php');
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="es">
 
@@ -84,7 +97,7 @@
                     </div>
 
                     <div class="row">
-                        <div class="col-md-7">
+                        <div class="col-md-8">
                             <div class="card card-info card-outline">
                                 <div class="card-header p-2">
                                     <strong>2. Historial del Paciente</strong>
@@ -106,7 +119,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-5">
+                        <div class="col-md-4">
                             <div class="card card-warning card-outline">
                                 <div class="card-header p-2">
                                     <strong>Resumen de Cobertura del Plan</strong>
@@ -123,24 +136,41 @@
                             <strong>3. Registrar Consulta</strong>
                         </div>
                         <div class="card-body">
-                            <div class="form-row">
-                                <div class="form-group col-md-4">
-                                    <label>Diagnóstico</label>
-                                    <input id="txtDiagnostico" class="form-control" maxlength="180">
+                            <div class="row">
+                                <!-- Columna izquierda: Campos de la consulta -->
+                                <div class="col-md-8">
+                                    <div class="mb-3">
+                                        <label for="txtDiagnostico" class="form-label">Diagnóstico <span class="text-danger">*</span></label>
+                                        <textarea class="form-control" id="txtDiagnostico" rows="3" placeholder="Ingrese el diagnóstico" required></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="txtProcedimiento" class="form-label">Procedimiento / Tratamiento</label>
+                                        <textarea class="form-control" id="txtProcedimiento" rows="3" placeholder="Ingrese el procedimiento o tratamiento"></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="txtIndicaciones" class="form-label">Indicaciones</label>
+                                        <textarea class="form-control" id="txtIndicaciones" rows="3" placeholder="Ingrese las indicaciones"></textarea>
+                                    </div>
                                 </div>
-                                <div class="form-group col-md-4">
-                                    <label>Procedimiento / Tratamiento</label>
-                                    <input id="txtProcedimiento" class="form-control" maxlength="180">
-                                </div>
-                                <div class="form-group col-md-4">
-                                    <label>Indicaciones</label>
-                                    <input id="txtIndicaciones" class="form-control" maxlength="180">
+                                <!-- Columna derecha: Ítems del plan a descontar -->
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label">Ítems del plan a descontar</label>
+                                        <div id="plan-items-checks">
+                                            <p class="text-muted">Seleccione un proceso para ver los ítems del plan.</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <button id="btnGuardarConsulta" class="btn btn-success" disabled>
-                                <i class="fas fa-save mr-1"></i>Guardar Consulta
-                            </button>
-                            <span id="lblConsultaMsg" class="ml-2 text-muted"></span>
+                            <div class="d-flex justify-content-end">
+                                <button type="button" class="btn btn-warning mr-2" id="btnCerrarProceso" disabled>
+                                    <i class="fas fa-door-closed mr-1"></i>Cerrar Proceso
+                                </button>
+                                <button type="button" class="btn btn-success" id="btnGuardarConsulta" disabled>
+                                    <i class="fas fa-save mr-1"></i>Guardar Consulta
+                                </button>
+                                <span id="lblConsultaMsg" class="ml-2 text-muted"></span>
+                            </div>
                         </div>
                     </div>
 
@@ -158,6 +188,9 @@
     <script src="plugins/jquery/jquery.min.js"></script>
     <script src="js/modal_cambiar_contrasena.js"></script>
     <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // ...el JS de gestión de atención y consulta se maneja en js/atencion_especialista.js...
+    </script>
     <script src="dist/js/adminlte.min.js"></script>
     <script src="plugins/sweetalert2/sweetalert2.min.js"></script>
     <script src="js/atencion_especialista.js"></script>

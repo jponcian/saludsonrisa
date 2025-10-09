@@ -1,5 +1,17 @@
 <?php
 require_once 'api/auth_check.php';
+require_once 'api/conexion.php';
+
+$paginaRuta = basename(__FILE__);
+$stmtPagina = $pdo->prepare('SELECT id FROM paginas WHERE ruta = ? LIMIT 1');
+$stmtPagina->execute([$paginaRuta]);
+$paginaId = $stmtPagina->fetchColumn();
+
+if (!$paginaId || !in_array((int) $paginaId, $permisos_usuario, true)) {
+    header('Location: app_inicio.php');
+    exit;
+}
+
 $current_page = basename($_SERVER['PHP_SELF']);
 // Construir la URL a cargar dentro del iframe según query params
 $page = isset($_GET['page']) ? $_GET['page'] : 'index';

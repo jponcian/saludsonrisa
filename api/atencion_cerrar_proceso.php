@@ -2,12 +2,13 @@
 require_once 'auth_check.php';
 require_once 'conexion.php';
 header('Content-Type: application/json');
-if ($rol !== 'admin_usuarios') {
+$puedeGestionarAtencion = in_array(5, $permisos_usuario, true);
+if (!$puedeGestionarAtencion) {
     http_response_code(403);
     echo json_encode(['status' => 'error', 'message' => 'No autorizado']);
     exit;
 }
-$id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
+$id = isset($_POST['id']) ? (int) $_POST['id'] : 0;
 if (!$id) {
     echo json_encode(['status' => 'error', 'message' => 'ID requerido']);
     exit;

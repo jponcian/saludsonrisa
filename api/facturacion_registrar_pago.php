@@ -2,15 +2,16 @@
 require_once 'auth_check.php';
 require_once 'conexion.php';
 header('Content-Type: application/json');
-if ($rol !== 'admin_usuarios') {
+$puedeGestionarFacturacion = in_array(2, $permisos_usuario, true);
+if (!$puedeGestionarFacturacion) {
     http_response_code(403);
     echo json_encode(['status' => 'error', 'message' => 'No autorizado']);
     exit;
 }
 
-$id_paciente = (int)($_POST['id_paciente'] ?? 0);
+$id_paciente = (int) ($_POST['id_paciente'] ?? 0);
 $tipo = $_POST['tipo_pago'] ?? '';
-$monto = isset($_POST['monto']) ? (float)$_POST['monto'] : 0.0;
+$monto = isset($_POST['monto']) ? (float) $_POST['monto'] : 0.0;
 $fecha = $_POST['fecha'] ?? '';
 $referencia = trim($_POST['referencia'] ?? '');
 
@@ -43,8 +44,8 @@ try {
         echo json_encode(['status' => 'error', 'message' => 'Paciente sin plan asignado']);
         exit;
     }
-    $plan_id = (int)$sus['plan_id'];
-    $cuotaAfiliacion = isset($sus['cuota_afiliacion']) ? (float)$sus['cuota_afiliacion'] : 0.0;
+    $plan_id = (int) $sus['plan_id'];
+    $cuotaAfiliacion = isset($sus['cuota_afiliacion']) ? (float) $sus['cuota_afiliacion'] : 0.0;
 
     // Verificar existencia de plan_pagos
     $hasPagos = $pdo->query("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=DATABASE() AND table_name='plan_pagos'")->fetchColumn();
@@ -67,7 +68,7 @@ try {
     // Total inscripción ya pagado para este plan
     $stmtTot = $pdo->prepare("SELECT COALESCE(SUM(monto),0) FROM plan_pagos WHERE paciente_id=? AND plan_id=? AND tipo_pago IN ('inscripcion','inscripcion_diferencia')");
     $stmtTot->execute([$id_paciente, $plan_id]);
-    $totalInscripcionPagada = (float)$stmtTot->fetchColumn();
+    $totalInscripcionPagada = (float) $stmtTot->fetchColumn();
 
     if ($tipo === 'inscripcion') {
         if ($cuotaAfiliacion <= 0) {

@@ -1,5 +1,29 @@
-<?php require_once 'api/auth_check.php';
-$current_page = basename($_SERVER['PHP_SELF']);
+<?php
+require_once 'api/auth_check.php';
+require_once 'api/conexion.php';
+require_once 'api/rol_utils.php';
+
+$roles_disponibles = [];
+try {
+  $stmt_roles = $pdo->query('SELECT id, nombre FROM roles ORDER BY nombre');
+  foreach ($stmt_roles->fetchAll(PDO::FETCH_ASSOC) as $rol_row) {
+    $rol_row['slug'] = rol_to_slug($rol_row['nombre']);
+    $roles_disponibles[] = $rol_row;
+  }
+} catch (PDOException $e) {
+  $roles_disponibles = [];
+}
+
+// Validar acceso según permisos configurados en app_acceso_admin.php
+$paginaRuta = basename(__FILE__);
+$stmtPagina = $pdo->prepare('SELECT id FROM paginas WHERE ruta = ? LIMIT 1');
+$stmtPagina->execute([$paginaRuta]);
+$paginaId = $stmtPagina->fetchColumn();
+
+if (!$paginaId || !in_array((int) $paginaId, $permisos_usuario, true)) {
+  header('Location: app_inicio.php');
+  exit;
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -98,7 +122,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <div class="modal fade" id="modal-registrar-usuario">
       <div class="modal-dialog">
         <div class="modal-content">
-          <div class="modal-header modal-header-gradient">
+          <div class="modal-header modal-header-gradient-blue-green">
             <h4 class="modal-title">Registrar Nuevo Usuario</h4><button type="button" class="close"
               data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
           </div>
@@ -114,12 +138,14 @@ $current_page = basename($_SERVER['PHP_SELF']);
               </div>
               <div class="form-group"><label>Contraseña</label><input type="password" class="form-control"
                   name="password" required></div>
-              <div class="form-group"><label>Rol</label><select class="form-control" name="rol" required>
+              <div class="form-group"><label>Rol</label><select class="form-control" name="rol_id" required>
                   <option value="" disabled selected>Seleccione un rol</option>
-                  <option value="especialista">Especialista</option>
-                  <option value="Estandar">Estandar</option>
-                  <option value="admin_usuarios">Admin. de Usuarios</option>
-
+                  <?php foreach ($roles_disponibles as $rol_item): ?>
+                    <option value="<?php echo (int) $rol_item['id']; ?>"
+                      data-slug="<?php echo htmlspecialchars($rol_item['slug']); ?>">
+                      <?php echo htmlspecialchars($rol_item['nombre']); ?>
+                    </option>
+                  <?php endforeach; ?>
                 </select></div>
               <div class="form-group">
                 <label for="foto">Foto de Perfil</label>
@@ -142,7 +168,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <div class="modal fade" id="modal-editar-usuario">
       <div class="modal-dialog">
         <div class="modal-content">
-          <div class="modal-header modal-header-gradient">
+          <div class="modal-header modal-header-gradient-blue-green">
             <h4 class="modal-title">Editar Usuario</h4>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
@@ -169,9 +195,13 @@ $current_page = basename($_SERVER['PHP_SELF']);
               </div>
               <div class="form-group">
                 <label for="edit-rol">Rol</label>
-                <select class="form-control" id="edit-rol" name="rol" required>
-                  <option value="especialista">Especialista</option>
-                  <option value="admin_usuarios">Admin. de Usuarios</option>
+                <select class="form-control" id="edit-rol" name="rol_id" required>
+                  <?php foreach ($roles_disponibles as $rol_item): ?>
+                    <option value="<?php echo (int) $rol_item['id']; ?>"
+                      data-slug="<?php echo htmlspecialchars($rol_item['slug']); ?>">
+                      <?php echo htmlspecialchars($rol_item['nombre']); ?>
+                    </option>
+                  <?php endforeach; ?>
                 </select>
               </div>
               <div class="form-group">
@@ -215,19 +245,24 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
   <script>
     // Definir el rol del usuario para el renderizado de botones
-    var usuarioRol = '<?php echo $rol; ?>';
+    var usuarioRol = '<?php echo addslashes($rol); ?>';
+    var usuarioRolSlug = '<?php echo addslashes(isset($rol_slug) ? $rol_slug : ''); ?>';
+    var usuarioPermisos = <?php echo json_encode(array_values($permisos_usuario)); ?>;
+    if (!Array.isArray(usuarioPermisos)) {
+      usuarioPermisos = [];
+    }
     var cropper;
     var currentFileInput;
 
-    $(function () {
+    $(function() {
       // Actualizar el label del input de archivo al seleccionar un archivo
-      $('.custom-file-input').on('change', function () {
+      $('.custom-file-input').on('change', function() {
         var file = this.files[0];
         currentFileInput = $(this);
 
         if (file) {
           var reader = new FileReader();
-          reader.onload = function (e) {
+          reader.onload = function(e) {
             $('#image-to-crop').attr('src', e.target.result);
             $('#modal-recortar-imagen').modal('show');
           };
@@ -236,7 +271,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
       });
 
       // Al mostrar el modal, inicializar Cropper
-      $('#modal-recortar-imagen').on('shown.bs.modal', function () {
+      $('#modal-recortar-imagen').on('shown.bs.modal', function() {
         if (cropper) {
           cropper.destroy();
         }
@@ -247,7 +282,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
       });
 
       // Al cerrar el modal, destruir Cropper y limpiar la imagen
-      $('#modal-recortar-imagen').on('hidden.bs.modal', function () {
+      $('#modal-recortar-imagen').on('hidden.bs.modal', function() {
         if (cropper) {
           cropper.destroy();
           cropper = null;
@@ -255,12 +290,12 @@ $current_page = basename($_SERVER['PHP_SELF']);
         $('#image-to-crop').attr('src', '');
       });
 
-      $('#crop-button').on('click', function () {
+      $('#crop-button').on('click', function() {
         if (cropper) {
           cropper.getCroppedCanvas({
             width: 200,
             height: 200,
-          }).toBlob(function (blob) {
+          }).toBlob(function(blob) {
             // Crear un objeto File a partir del Blob
             var croppedFile = new File([blob], "cropped_image.png", {
               type: "image/png"
@@ -275,7 +310,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
             currentFileInput.next('.custom-file-label').html("Imagen recortada.png");
 
             // Reiniciar Cropper.js y limpiar la imagen al cerrar el modal
-            $('#modal-recortar-imagen').on('hidden.bs.modal', function () {
+            $('#modal-recortar-imagen').on('hidden.bs.modal', function() {
               if (cropper) {
                 cropper.destroy();
                 cropper = null; // Asegurarse de que la variable cropper sea nula
@@ -297,47 +332,96 @@ $current_page = basename($_SERVER['PHP_SELF']);
           "dataSrc": "data"
         },
         "columns": [{
-          "data": "id"
-        }, {
-          "data": "username"
-        }, {
-          "data": "foto",
-          "className": "text-center", // Añadido para centrar el contenido
-          "render": function (data, type, row) {
-            if (data) {
-              return `<img src="uploads/${data}" class="img-circle elevation-2" style="width: 40px; height: 40px; object-fit: cover;">`;
-            } else {
-              return `<img src="logo.png" class="img-circle elevation-2" style="width: 40px; height: 40px; object-fit: cover;">`;
+            "data": "id"
+          }, {
+            "data": "username"
+          }, {
+            "data": "foto",
+            "className": "text-center", // Añadido para centrar el contenido
+            "render": function(data, type, row) {
+              if (data) {
+                return `<img src="uploads/${data}" class="img-circle elevation-2" style="width: 40px; height: 40px; object-fit: cover;">`;
+              } else {
+                return `<img src="logo.png" class="img-circle elevation-2" style="width: 40px; height: 40px; object-fit: cover;">`;
+              }
+            }
+          }, {
+            "data": "nombre_completo"
+          }, {
+            "data": "cedula"
+          }, {
+            "data": "telefono"
+          }, {
+            "data": "rol_nombre"
+          },
+          {
+            "data": null,
+            "render": function(data, type, row) {
+              var html = `<button class="btn btn-info btn-sm btn-editar" data-id="${row.id}"><i class="fas fa-pencil-alt"></i> Editar</button>`;
+              if (Array.isArray(usuarioPermisos) && usuarioPermisos.includes(4)) {
+                html += ` <button class="btn btn-danger btn-sm btn-eliminar" data-id="${row.id}"><i class="fas fa-trash"></i> Eliminar</button>`;
+              }
+              return html;
             }
           }
-        }, {
-          "data": "nombre_completo"
-        }, {
-          "data": "cedula"
-        }, {
-          "data": "telefono"
-        }, {
-          "data": "rol"
-        },
-        {
-          "data": null,
-          "render": function (data, type, row) {
-            var html = `<button class="btn btn-info btn-sm btn-editar" data-id="${row.id}"><i class="fas fa-pencil-alt"></i> Editar</button>`;
-            if (typeof usuarioRol !== 'undefined' && usuarioRol !== 'Estandar') {
-              html += ` <button class="btn btn-danger btn-sm btn-eliminar" data-id="${row.id}"><i class="fas fa-trash"></i> Eliminar</button>`;
-            }
-            return html;
-          }
-        }
         ],
         "language": {
           "url": "plugins/datatables/i18n/Spanish.json"
         }
       });
 
-      $('#form-registrar-usuario').on('submit', function (e) {
+      $('#form-registrar-usuario').on('submit', function(e) {
         e.preventDefault();
-        var formData = new FormData(this);
+
+        // Validaciones del formulario
+        var username = $('input[name="username"]').val().trim();
+        var nombre_completo = $('input[name="nombre_completo"]').val().trim();
+        var password = $('input[name="password"]').val();
+        var rol_id = $('select[name="rol_id"]').val();
+
+        if (username.length < 3) {
+          Swal.fire('Error', 'El nombre de usuario debe tener al menos 3 caracteres.', 'error');
+          return;
+        }
+        if (nombre_completo === '') {
+          Swal.fire('Error', 'El nombre completo es obligatorio.', 'error');
+          return;
+        }
+        if (password.length < 6) {
+          Swal.fire('Error', 'La contraseña debe tener al menos 6 caracteres.', 'error');
+          return;
+        }
+        if (!rol_id) {
+          Swal.fire('Error', 'Debe seleccionar un rol.', 'error');
+          return;
+        }
+
+        // Verificar si el username ya existe
+        $.ajax({
+          url: 'api/verificar_username.php',
+          type: 'POST',
+          data: {
+            username: username
+          },
+          dataType: 'json',
+          async: false, // Sincrono para bloquear el envío
+          success: function(response) {
+            if (response.exists) {
+              Swal.fire('Error', 'El nombre de usuario ya existe.', 'error');
+              return;
+            } else {
+              // Si no existe, proceder con el envío
+              enviarFormularioRegistro();
+            }
+          },
+          error: function() {
+            Swal.fire('Error', 'Error al verificar el nombre de usuario.', 'error');
+          }
+        });
+      });
+
+      function enviarFormularioRegistro() {
+        var formData = new FormData($('#form-registrar-usuario')[0]);
 
         $.ajax({
           url: 'api/registrar_usuario.php',
@@ -346,7 +430,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
           dataType: 'json',
           processData: false,
           contentType: false,
-          success: function (response) {
+          success: function(response) {
             if (response.status === 'success') {
               $('#modal-registrar-usuario').modal('hide');
               $('#form-registrar-usuario')[0].reset();
@@ -354,16 +438,16 @@ $current_page = basename($_SERVER['PHP_SELF']);
               tablaUsuarios.ajax.reload();
               Swal.fire('¡Éxito!', response.message, 'success');
             } else {
-              $('#error-message').text(response.message).show();
+              Swal.fire('Error', response.message, 'error');
             }
           },
-          error: function (jqXHR) {
-            $('#error-message').text(jqXHR.responseJSON.message || 'Error de conexión.').show();
+          error: function(jqXHR) {
+            Swal.fire('Error', jqXHR.responseJSON ? jqXHR.responseJSON.message : 'Error de conexión.', 'error');
           }
         });
-      });
+      }
 
-      $('#tabla-usuarios tbody').on('click', '.btn-editar', function () {
+      $('#tabla-usuarios tbody').on('click', '.btn-editar', function() {
         var id = $(this).data('id');
         $.ajax({
           url: 'api/get_usuario.php',
@@ -372,7 +456,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
             id: id
           },
           dataType: 'json',
-          success: function (response) {
+          success: function(response) {
             if (response.status === 'success') {
               var usuario = response.data;
               $('#edit-id').val(usuario.id);
@@ -380,7 +464,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
               $('#edit-nombre-completo').val(usuario.nombre_completo);
               $('#edit-cedula').val(usuario.cedula);
               $('#edit-telefono').val(usuario.telefono);
-              $('#edit-rol').val(usuario.rol);
+              $('#edit-rol').val(usuario.rol_id);
               // Mostrar la foto de perfil
               if (usuario.foto) {
                 $('#edit-foto-preview').attr('src', 'uploads/' + usuario.foto);
@@ -396,9 +480,60 @@ $current_page = basename($_SERVER['PHP_SELF']);
         });
       });
 
-      $('#form-editar-usuario').on('submit', function (e) {
+      $('#form-editar-usuario').on('submit', function(e) {
         e.preventDefault();
-        var formData = new FormData(this);
+
+        // Validaciones del formulario
+        var username = $('#edit-username').val().trim();
+        var nombre_completo = $('#edit-nombre-completo').val().trim();
+        var password = $('#edit-password').val();
+        var rol_id = $('#edit-rol').val();
+        var id = $('#edit-id').val();
+
+        if (username.length < 3) {
+          Swal.fire('Error', 'El nombre de usuario debe tener al menos 3 caracteres.', 'error');
+          return;
+        }
+        if (nombre_completo === '') {
+          Swal.fire('Error', 'El nombre completo es obligatorio.', 'error');
+          return;
+        }
+        if (password && password.length < 6) {
+          Swal.fire('Error', 'La nueva contraseña debe tener al menos 6 caracteres.', 'error');
+          return;
+        }
+        if (!rol_id) {
+          Swal.fire('Error', 'Debe seleccionar un rol.', 'error');
+          return;
+        }
+
+        // Verificar si el username ya existe (excluyendo el usuario actual)
+        $.ajax({
+          url: 'api/verificar_username.php',
+          type: 'POST',
+          data: {
+            username: username,
+            exclude_id: id
+          },
+          dataType: 'json',
+          async: false,
+          success: function(response) {
+            if (response.exists) {
+              Swal.fire('Error', 'El nombre de usuario ya existe.', 'error');
+              return;
+            } else {
+              // Proceder con el envío
+              enviarFormularioEdicion();
+            }
+          },
+          error: function() {
+            Swal.fire('Error', 'Error al verificar el nombre de usuario.', 'error');
+          }
+        });
+      });
+
+      function enviarFormularioEdicion() {
+        var formData = new FormData($('#form-editar-usuario')[0]);
 
         $.ajax({
           url: 'api/editar_usuario.php',
@@ -407,7 +542,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
           dataType: 'json',
           processData: false,
           contentType: false,
-          success: function (response) {
+          success: function(response) {
             if (response.status === 'success') {
               $('#modal-editar-usuario').modal('hide');
               tablaUsuarios.ajax.reload();
@@ -417,10 +552,10 @@ $current_page = basename($_SERVER['PHP_SELF']);
             }
           }
         });
-      });
+      }
 
       // Eliminar usuario (un solo handler, mensaje consistente)
-      $('#tabla-usuarios tbody').on('click', '.btn-eliminar', function () {
+      $('#tabla-usuarios tbody').on('click', '.btn-eliminar', function() {
         var id = $(this).data('id');
         Swal.fire({
           title: '¿Eliminar usuario?',
@@ -440,7 +575,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 id: id
               },
               dataType: 'json',
-              success: function (response) {
+              success: function(response) {
                 if (response.status === 'success') {
                   Swal.fire({
                     icon: 'success',
@@ -466,7 +601,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                   });
                 }
               },
-              error: function () {
+              error: function() {
                 Swal.fire({
                   icon: 'error',
                   title: 'Error',
@@ -490,7 +625,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
     aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
-        <div class="modal-header modal-header-gradient">
+        <div class="modal-header modal-header-gradient-blue-green">
           <h5 class="modal-title" id="modalLabel">Recortar Imagen</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>

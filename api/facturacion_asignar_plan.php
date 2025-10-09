@@ -2,13 +2,14 @@
 require_once 'auth_check.php';
 require_once 'conexion.php';
 header('Content-Type: application/json');
-if ($rol !== 'admin_usuarios') {
+$puedeGestionarFacturacion = in_array(2, $permisos_usuario, true);
+if (!$puedeGestionarFacturacion) {
     http_response_code(403);
     echo json_encode(['status' => 'error', 'message' => 'No autorizado']);
     exit;
 }
-$id_paciente = (int)($_POST['id_paciente'] ?? 0);
-$plan_id = (int)($_POST['plan_id'] ?? 0);
+$id_paciente = (int) ($_POST['id_paciente'] ?? 0);
+$plan_id = (int) ($_POST['plan_id'] ?? 0);
 $obs = trim($_POST['obs'] ?? ''); // se ignora en este modelo simplificado
 if (!$id_paciente || !$plan_id) {
     echo json_encode(['status' => 'error', 'message' => 'Datos incompletos']);
@@ -28,7 +29,7 @@ try {
     $cur->execute([$id_paciente]);
     $susActual = $cur->fetch(PDO::FETCH_ASSOC);
     if ($susActual) {
-        if ((int)$susActual['plan_id'] === $plan_id) {
+        if ((int) $susActual['plan_id'] === $plan_id) {
             echo json_encode(['status' => 'error', 'message' => 'El paciente ya tiene este plan asignado']);
             exit;
         }

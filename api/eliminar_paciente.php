@@ -2,7 +2,9 @@
 require_once 'auth_check.php';
 require_once 'conexion.php';
 header('Content-Type: application/json');
-if ($rol === 'Estandar') {
+$puedeEliminarPaciente = in_array(1, $permisos_usuario, true);
+if (!$puedeEliminarPaciente) {
+    http_response_code(403);
     echo json_encode(['status' => 'error', 'message' => 'No tienes permisos para eliminar pacientes.']);
     exit;
 }

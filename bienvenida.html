@@ -1,58 +1,110 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Bienvenido | Clínica SaludSonrisa</title>
-    <link rel="stylesheet" href="css/custom.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="dist/css/adminlte.min.css">
     <style>
-      body {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        min-height: 100vh;
-        background: linear-gradient(
-          120deg,
-          rgba(100, 180, 255, 0.13) 0%,
-          rgba(180, 255, 220, 0.1) 100%
-        );
-        margin: 0;
-      }
-      .welcome-container {
-        text-align: center;
-        background: rgba(255, 255, 255, 0.7);
-        border-radius: 18px;
-        padding: 40px 30px 30px 30px;
-        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
-      }
-      .welcome-logo {
-        width: 120px;
-        margin-bottom: 24px;
-      }
-      .welcome-title {
-        font-size: 2.2rem;
-        color: #007bff;
-        margin-bottom: 10px;
-      }
-      .welcome-msg {
-        font-size: 1.2rem;
-        color: #333;
-      }
+        body {
+            background: linear-gradient(120deg, rgba(100, 180, 255, 0.13) 0%, rgba(180, 255, 220, 0.1) 100%);
+        }
+        .welcome-header {
+            text-align: center;
+            padding: 60px 20px;
+            background: linear-gradient(to right, #007bff, #28a745);
+            color: white;
+            border-radius: 0 0 25px 25px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        .welcome-header h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        .welcome-header p {
+            font-size: 1.5rem;
+            font-weight: 300;
+        }
+        .action-card {
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: none;
+            border-radius: 15px;
+        }
+        .action-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+        .action-card .card-body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+        }
+        .action-card .card-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            transition: color 0.3s;
+        }
+        .action-card:hover .card-icon {
+            color: #007bff;
+        }
+        .action-card .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
     </style>
-  </head>
-  <body>
-    <div class="welcome-container">
-      <img
-        src="logo.png"
-        alt="Logo Clínica SaludSonrisa"
-        class="welcome-logo"
-      />
-      <div class="welcome-title">¡Bienvenido!</div>
-      <div class="welcome-msg">
-        Has iniciado sesión en <b>Clínica SaludSonrisa</b>.<br />¡Que tengas un
-        excelente día!
-      </div>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="welcome-header">
+            <h1>¡Bienvenido a Clínica SaludSonrisa!</h1>
+            <p>Tu sistema de gestión médica, más intuitivo y eficiente que nunca.</p>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="card action-card">
+                        <div class="card-body text-center">
+                            <i class="fas fa-users card-icon text-primary"></i>
+                            <h5 class="card-title">Gestionar Pacientes</h5>
+                            <p class="card-text">Registra, consulta y administra la información de tus pacientes.</p>
+                            <a href="app_pacientes.php" class="btn btn-outline-primary">Ir a Pacientes</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card action-card">
+                        <div class="card-body text-center">
+                            <i class="fas fa-user-md card-icon text-success"></i>
+                            <h5 class="card-title">Atención Médica</h5>
+                            <p class="card-text">Inicia y gestiona los procesos de atención y consulta para los pacientes.</p>
+                            <a href="app_atencion_admin.php" class="btn btn-outline-success">Iniciar Atención</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card action-card">
+                        <div class="card-body text-center">
+                            <i class="fas fa-file-invoice-dollar card-icon text-warning"></i>
+                            <h5 class="card-title">Facturación</h5>
+                            <p class="card-text">Administra planes de pago, suscripciones y facturas de los pacientes.</p>
+                            <a href="app_facturacion.php" class="btn btn-outline-warning">Ir a Facturación</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </body>
+
+    <script src="plugins/jquery/jquery.min.js"></script>
+    <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="dist/js/adminlte.min.js"></script>
+</body>
 </html>

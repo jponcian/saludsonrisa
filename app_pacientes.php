@@ -1,10 +1,21 @@
 <?php
 require_once 'api/auth_check.php';
+require_once 'api/conexion.php';
+
+$paginaRuta = basename(__FILE__);
+$stmtPagina = $pdo->prepare('SELECT id FROM paginas WHERE ruta = ? LIMIT 1');
+$stmtPagina->execute([$paginaRuta]);
+$paginaId = $stmtPagina->fetchColumn();
+
+if (!$paginaId || !in_array((int) $paginaId, $permisos_usuario, true)) {
+  header('Location: app_inicio.php');
+  exit;
+}
+
 $current_page = basename($_SERVER['PHP_SELF']);
 // Obtener el id de especialista si el usuario es especialista
 $especialista_id = null;
 if ($rol === 'especialista') {
-  require_once 'api/conexion.php';
   $stmt = $pdo->prepare('SELECT id FROM especialistas WHERE usuario_id = ? LIMIT 1');
   $stmt->execute([$usuario_id]);
   $row = $stmt->fetch();

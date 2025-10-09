@@ -29,7 +29,8 @@ try {
         }
     }
 
-    if (!isset($rol) || $rol !== 'admin_usuarios') {
+    $puedeGestionarAtencion = in_array(5, $permisos_usuario, true);
+    if (!$puedeGestionarAtencion) {
         http_response_code(403);
         echo json_encode(['status' => 'error', 'message' => 'No autorizado']);
         exit;
@@ -101,7 +102,8 @@ try {
             throw new Exception('Error MySQL: ' . $db->error);
         }
         $rows = [];
-        while ($r = $res->fetch_assoc()) $rows[] = $r;
+        while ($r = $res->fetch_assoc())
+            $rows[] = $r;
         echo json_encode(['status' => 'ok', 'data' => $rows]);
         exit;
     }

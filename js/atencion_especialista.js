@@ -11,23 +11,28 @@
   const txtProcedimiento = $("#txtProcedimiento");
   const txtIndicaciones = $("#txtIndicaciones");
   const btnGuardar = $("#btnGuardarConsulta");
+  const btnCerrarProceso = $("#btnCerrarProceso");
+  const contenedorItemsPlan = $("#plan-items-checks");
 
-  let _procesos = [];
-  let _pacienteActual = null;
+  let procesos = [];
+  let pacienteActual = null;
+
+  const MENSAJE_ITEMS_DEFAULT =
+    '<p class="text-muted">Seleccione un proceso para ver los ítems del plan.</p>';
 
   function api(url, data, method = "POST") {
-    return $.ajax({ url, method, data, dataType: "json" });
+    return $.ajax({ url: url, method: method, data: data, dataType: "json" });
   }
 
   function cargarProcesos() {
     selProceso.html('<option value="">Cargando...</option>');
     api("api/atencion_listar_procesos_abiertos.php", {}, "GET")
-      .done((resp) => {
+      .done(function (resp) {
         if (resp.status === "ok") {
-          _procesos = resp.data || [];
-          const opts = ['<option value="">-- Seleccione --</option>'];
-          _procesos.forEach((p) =>
-            opts.push(
+          procesos = resp.data || [];
+          var opciones = ['<option value="">-- Seleccione --</option>'];
+          procesos.forEach(function (p) {
+            opciones.push(
               '<option value="' +
                 p.id +
                 '">#' +
@@ -35,32 +40,43 @@
                 " - " +
                 p.paciente +
                 "</option>"
-            )
-          );
-          selProceso.html(opts.join(""));
-        } else selProceso.html('<option value="">Sin datos</option>');
+            );
+          });
+          selProceso.html(opciones.join(""));
+        } else {
+          selProceso.html('<option value="">Sin datos</option>');
+        }
       })
-      .fail(() => selProceso.html('<option value="">Error</option>'));
+      .fail(function () {
+        selProceso.html('<option value="">Error</option>');
+      });
   }
 
-  function seleccionarProceso(id) {
-    const pr = _procesos.find((x) => x.id == id);
-    if (!pr) {
+  function seleccionarProceso(idProceso) {
+    var proceso = procesos.find(function (p) {
+      return String(p.id) === String(idProceso);
+    });
+
+    if (!proceso) {
       limpiarProceso();
       return;
     }
-    _pacienteActual = pr.paciente_id;
-    txtPacienteNombre.val(pr.paciente || "");
-    txtPlanE.val(pr.plan || "");
-    txtCoberturaE.val(pr.cobertura || "");
-    txtEstadoProcesoE.val(pr.estado || "");
+
+    pacienteActual = proceso.paciente_id;
+    txtPacienteNombre.val(proceso.paciente || "");
+    txtPlanE.val(proceso.plan || "");
+    txtCoberturaE.val(proceso.cobertura || "");
+    txtEstadoProcesoE.val(proceso.estado || "");
     btnGuardar.prop("disabled", false);
-    cargarHistorial(pr.paciente_id);
-    cargarResumenPlan(pr.paciente_id, pr.plan);
+    btnCerrarProceso.prop("disabled", false).data("procesoId", proceso.id);
+
+    cargarHistorial(proceso.paciente_id);
+    cargarResumenPlan(proceso.paciente_id, proceso.plan);
+    cargarItemsPlan(proceso.paciente_id);
   }
 
   function limpiarProceso() {
-    _pacienteActual = null;
+    pacienteActual = null;
     txtPacienteNombre.val("");
     txtPlanE.val("");
     txtCoberturaE.val("");
@@ -69,7 +85,9 @@
     divResumenPlan.html(
       '<p class="text-muted text-center">Seleccione un proceso para ver la cobertura.</p>'
     );
+    contenedorItemsPlan.html(MENSAJE_ITEMS_DEFAULT);
     btnGuardar.prop("disabled", true);
+    btnCerrarProceso.prop("disabled", true).removeData("procesoId");
   }
 
   function cargarHistorial(idPaciente) {
@@ -81,10 +99,10 @@
       { id_paciente: idPaciente },
       "GET"
     )
-      .done((resp) => {
+      .done(function (resp) {
         if (resp.status === "ok") {
-          const rows = (resp.data || []).map(
-            (r) =>
+          var filas = (resp.data || []).map(function (r) {
+            return (
               "<tr>" +
               "<td>" +
               r.fecha +
@@ -95,21 +113,23 @@
               "</td><td>" +
               (r.especialista || "") +
               "</td></tr>"
-          );
+            );
+          });
           tablaHistorial.html(
-            rows.join("") ||
+            filas.join("") ||
               '<tr><td colspan="4" class="text-center text-muted">Sin registros</td></tr>'
           );
-        } else
+        } else {
           tablaHistorial.html(
             '<tr><td colspan="4" class="text-center text-danger">Error</td></tr>'
           );
+        }
       })
-      .fail(() =>
+      .fail(function () {
         tablaHistorial.html(
           '<tr><td colspan="4" class="text-center text-danger">Error</td></tr>'
-        )
-      );
+        );
+      });
   }
 
   function cargarResumenPlan(idPaciente, planNombre) {
@@ -124,54 +144,224 @@
       '<p class="text-muted text-center">Cargando resumen...</p>'
     );
     api("api/atencion_resumen_consumos.php", { id_paciente: idPaciente }, "GET")
-      .done((resp) => {
+      .done(function (resp) {
         if (resp.status !== "ok" || !resp.kpis) {
           divResumenPlan.html(
             '<p class="text-danger text-center">Error al cargar resumen.</p>'
           );
           return;
         }
+
         if (!resp.kpis.length) {
           divResumenPlan.html(
-            `<h6 class='text-center'>Plan: <strong>${
-              planNombre || "N/A"
-            }</strong></h6><p class='text-muted text-center mt-3'>Este plan no tiene cobertura de servicios por cantidad.</p>`
+            "<h6 class='text-center'>Plan: <strong>" +
+              (planNombre || "N/A") +
+              "</strong></h6><p class='text-muted text-center mt-3'>Este plan no tiene cobertura de servicios por cantidad.</p>"
           );
           return;
         }
 
-        let html = `<h6 class='text-center'>Plan: <strong>${
-          planNombre || "N/A"
-        }</strong></h6>`;
-        resp.kpis.forEach((kpi) => {
-          const perc = kpi.max > 0 ? (kpi.usado / kpi.max) * 100 : 0;
-          let color = "bg-success";
-          if (perc >= 50) color = "bg-warning";
-          if (perc >= 90) color = "bg-danger";
+        var html =
+          "<h6 class='text-center'>Plan: <strong>" +
+          (planNombre || "N/A") +
+          "</strong></h6>";
 
-          html += `
-                <div class="progress-group">
-                    ${kpi.nombre}
-                    <span class="float-right"><b>${kpi.usado}</b>/${kpi.max}</span>
-                    <div class="progress progress-sm">
-                        <div class="progress-bar ${color}" style="width: ${perc}%"></div>
-                    </div>
-                </div>`;
+        resp.kpis.forEach(function (kpi) {
+          var porcentaje = kpi.max > 0 ? (kpi.usado / kpi.max) * 100 : 0;
+          var color = "bg-success";
+          if (porcentaje >= 50) {
+            color = "bg-warning";
+          }
+          if (porcentaje >= 90) {
+            color = "bg-danger";
+          }
+
+          html +=
+            '<div class="progress-group">' +
+            kpi.nombre +
+            '<span class="float-right"><b>' +
+            kpi.usado +
+            "</b>/" +
+            kpi.max +
+            "</span>" +
+            '<div class="progress progress-sm">' +
+            '<div class="progress-bar ' +
+            color +
+            '" style="width: ' +
+            porcentaje +
+            '%"></div>' +
+            "</div>" +
+            "</div>";
         });
+
         divResumenPlan.html(html);
       })
-      .fail(() => {
+      .fail(function () {
         divResumenPlan.html(
           '<p class="text-danger text-center">Error al cargar resumen.</p>'
         );
       });
   }
 
+  function renderItemsPlan(items) {
+    var itemsVisibles = (items || []).filter(function (item) {
+      var etiqueta = (item.nombre || item.codigo || "").toString();
+      return etiqueta.indexOf("%") === -1;
+    });
+
+    if (!itemsVisibles.length) {
+      contenedorItemsPlan.html(
+        '<p class="text-muted">Este plan no tiene ítems configurados para descontar.</p>'
+      );
+      return;
+    }
+
+    var html = itemsVisibles
+      .map(function (item, index) {
+        var restante =
+          typeof item.restante === "number"
+            ? item.restante
+            : item.max - item.usado;
+        var agotado = restante <= 0;
+        var inputId = "plan-item-" + index;
+        var badge = agotado
+          ? '<span class="badge badge-danger ml-2">Agotado</span>'
+          : '<span class="badge badge-info ml-2">Disponibles: ' +
+            restante +
+            "</span>";
+
+        return (
+          '<div class="custom-control custom-checkbox mb-2">' +
+          '<input type="checkbox" class="custom-control-input plan-item-check" id="' +
+          inputId +
+          '" value="' +
+          item.codigo +
+          '" ' +
+          (agotado ? "disabled" : "") +
+          ">" +
+          '<label class="custom-control-label" for="' +
+          inputId +
+          '"><strong>' +
+          (item.nombre || item.codigo) +
+          "</strong>" +
+          badge +
+          "</label>" +
+          "</div>"
+        );
+      })
+      .join("");
+
+    contenedorItemsPlan.html(html);
+  }
+
+  function cargarItemsPlan(idPaciente) {
+    if (!idPaciente) {
+      contenedorItemsPlan.html(
+        '<p class="text-warning">No se localizaron ítems para este paciente.</p>'
+      );
+      return;
+    }
+
+    contenedorItemsPlan.html(
+      '<p class="text-muted">Cargando ítems del plan...</p>'
+    );
+    api("api/plan_items_paciente.php", { id_paciente: idPaciente }, "GET")
+      .done(function (resp) {
+        if (resp.status !== "ok") {
+          contenedorItemsPlan.html(
+            '<p class="text-danger">No fue posible obtener los ítems del plan.</p>'
+          );
+          return;
+        }
+
+        var items = resp.items || [];
+        renderItemsPlan(items);
+      })
+      .fail(function () {
+        contenedorItemsPlan.html(
+          '<p class="text-danger">Error al cargar los ítems del plan.</p>'
+        );
+      });
+  }
+
+  function obtenerItemsSeleccionados() {
+    var seleccionados = [];
+    contenedorItemsPlan.find("input.plan-item-check:checked").each(function () {
+      seleccionados.push($(this).val());
+    });
+    return seleccionados;
+  }
+
+  function cerrarProcesoActual() {
+    var procesoId = btnCerrarProceso.data("procesoId") || selProceso.val();
+
+    if (!procesoId) {
+      Swal.fire({
+        icon: "warning",
+        title: "Proceso no seleccionado",
+        text: "Selecciona un proceso antes de intentar cerrarlo.",
+      });
+      return;
+    }
+
+    Swal.fire({
+      title: "¿Cerrar proceso?",
+      text:
+        "Se marcará como cerrado el proceso de atención #" +
+        procesoId +
+        ". Esta acción no se puede deshacer.",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#28a745",
+      cancelButtonColor: "#6c757d",
+      confirmButtonText: "Sí, cerrar",
+      cancelButtonText: "Cancelar",
+    }).then(function (result) {
+      if (!result.isConfirmed) {
+        return;
+      }
+
+      btnCerrarProceso.prop("disabled", true);
+
+      api("api/atencion_cerrar_proceso.php", { id: procesoId })
+        .done(function (resp) {
+          if (resp.status === "ok") {
+            Swal.fire({
+              icon: "success",
+              title: "Proceso cerrado",
+              text: "El proceso se cerró correctamente.",
+              showConfirmButton: false,
+              timer: 1800,
+            });
+            selProceso.val("");
+            limpiarProceso();
+            cargarProcesos();
+          } else {
+            Swal.fire(
+              "Error",
+              resp.message || "No se pudo cerrar el proceso.",
+              "error"
+            );
+            btnCerrarProceso.prop("disabled", false);
+          }
+        })
+        .fail(function () {
+          Swal.fire(
+            "Error de Conexión",
+            "No se pudo comunicar con el servidor.",
+            "error"
+          );
+          btnCerrarProceso.prop("disabled", false);
+        });
+    });
+  }
+
   function guardarConsulta() {
-    const procesoId = selProceso.val();
-    const diagnostico = txtDiagnostico.val().trim();
-    const procedimiento = txtProcedimiento.val().trim();
-    const indicaciones = txtIndicaciones.val().trim();
+    var procesoId = selProceso.val();
+    var diagnostico = txtDiagnostico.val().trim();
+    var procedimiento = txtProcedimiento.val().trim();
+    var indicaciones = txtIndicaciones.val().trim();
+
     if (!procesoId) {
       Swal.fire({
         icon: "warning",
@@ -181,7 +371,10 @@
       return;
     }
 
-    const proceso = _procesos.find((x) => String(x.id) === String(procesoId));
+    var proceso = procesos.find(function (p) {
+      return String(p.id) === String(procesoId);
+    });
+
     if (!proceso) {
       Swal.fire({
         icon: "error",
@@ -201,23 +394,31 @@
       );
       return;
     }
+
     btnGuardar.prop("disabled", true);
+
+    var itemsPlanSeleccionados = obtenerItemsSeleccionados();
 
     api("api/atencion_registrar_consulta.php", {
       id_paciente: proceso.paciente_id,
       proceso_id: procesoId,
-      diagnostico,
-      procedimiento,
-      indicaciones,
+      diagnostico: diagnostico,
+      procedimiento: procedimiento,
+      indicaciones: indicaciones,
+      items_plan: itemsPlanSeleccionados,
     })
-      .done((resp) => {
+      .done(function (resp) {
         if (resp.status === "ok") {
           Swal.fire("Éxito", resp.message, "success");
           txtDiagnostico.val("");
           txtProcedimiento.val("");
           txtIndicaciones.val("");
+          contenedorItemsPlan
+            .find("input.plan-item-check")
+            .prop("checked", false);
           cargarHistorial(proceso.paciente_id);
-          cargarResumenPlan(proceso.paciente_id, txtPlanE.val()); // Recargar resumen
+          cargarResumenPlan(proceso.paciente_id, txtPlanE.val());
+          cargarItemsPlan(proceso.paciente_id);
         } else {
           Swal.fire(
             "Error",
@@ -226,19 +427,26 @@
           );
         }
       })
-      .fail(() =>
+      .fail(function () {
         Swal.fire(
           "Error de Conexión",
           "No se pudo comunicar con el servidor.",
           "error"
-        )
-      )
-      .always(() => btnGuardar.prop("disabled", false));
+        );
+      })
+      .always(function () {
+        btnGuardar.prop("disabled", false);
+      });
   }
 
-  // Eventos
-  selProceso.on("change", () => seleccionarProceso(selProceso.val()));
-  btnGuardar.on("click", guardarConsulta);
+  selProceso.on("change", function () {
+    seleccionarProceso(selProceso.val());
+  });
 
+  btnGuardar.on("click", guardarConsulta);
+  btnCerrarProceso.on("click", cerrarProcesoActual);
+
+  btnCerrarProceso.prop("disabled", true);
+  contenedorItemsPlan.html(MENSAJE_ITEMS_DEFAULT);
   cargarProcesos();
 })();

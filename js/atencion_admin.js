@@ -277,15 +277,9 @@
               "</td>" +
               '<td class="text-center">' +
               (p.estado === "abierto"
-                ? '<button class="btn btn-sm btn-primary btn-procesar mr-1" data-id="' +
+                ? '<button class="btn btn-sm btn-warning btn-cerrar" data-id="' +
                   p.id +
-                  '">' +
-                  '<i class="fas fa-play"></i> Procesar</button>' +
-                  '<button class="btn btn-xs btn-outline-danger btn-cerrar" data-id="' +
-                  p.id +
-                  '">' +
-                  '<i class="fas fa-trash-alt"></i>' +
-                  "</button>"
+                  '"><i class="fas fa-door-closed mr-1"></i>Cerrar proceso</button>'
                 : "-") +
               "</td>" +
               "</tr>"
@@ -354,30 +348,34 @@
   tablaProcesos.on("click", ".btn-cerrar", function () {
     const id = $(this).data("id");
     Swal.fire({
-      title: "¿Estás seguro?",
+      title: "¿Cerrar proceso?",
       text:
-        "Esta acción eliminará permanentemente el proceso de atención #" + id,
-      icon: "warning",
+        "Se marcará como cerrado el proceso de atención #" +
+        id +
+        ". Esta acción no se puede deshacer.",
+      icon: "question",
       showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Sí, eliminar",
+      confirmButtonColor: "#28a745",
+      cancelButtonColor: "#6c757d",
+      confirmButtonText: "Sí, cerrar",
       cancelButtonText: "Cancelar",
     }).then((result) => {
       if (result.isConfirmed) {
-        api("api/atencion_eliminar_proceso.php", { id })
+        api("api/atencion_cerrar_proceso.php", { id })
           .done((resp) => {
             if (resp.status === "ok") {
-              Swal.fire(
-                "Eliminado",
-                "El proceso ha sido eliminado con éxito.",
-                "success"
-              );
+              Swal.fire({
+                icon: "success",
+                title: "Proceso cerrado",
+                text: "El proceso se cerró correctamente.",
+                showConfirmButton: false,
+                timer: 1800,
+              });
               cargarProcesos();
             } else {
               Swal.fire(
                 "Error",
-                resp.message || "No se pudo eliminar el proceso.",
+                resp.message || "No se pudo cerrar el proceso.",
                 "error"
               );
             }
@@ -390,20 +388,6 @@
             );
           });
       }
-    });
-  });
-
-  // Handler placeholder para 'Procesar' — por ahora no realiza cambios
-  tablaProcesos.on("click", ".btn-procesar", function () {
-    const id = $(this).data("id");
-    console.log("Procesar (placeholder) proceso id:", id);
-    Swal.fire({
-      icon: "info",
-      title: "Procesar",
-      text:
-        "Funcionalidad de procesar activada (placeholder) para proceso #" + id,
-      timer: 1500,
-      showConfirmButton: false,
     });
   });
 

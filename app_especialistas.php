@@ -1,4 +1,17 @@
-<?php require_once 'api/auth_check.php';
+<?php
+require_once 'api/auth_check.php';
+require_once 'api/conexion.php';
+
+$paginaRuta = basename(__FILE__);
+$stmtPagina = $pdo->prepare('SELECT id FROM paginas WHERE ruta = ? LIMIT 1');
+$stmtPagina->execute([$paginaRuta]);
+$paginaId = $stmtPagina->fetchColumn();
+
+if (!$paginaId || !in_array((int) $paginaId, $permisos_usuario, true)) {
+  header('Location: app_inicio.php');
+  exit;
+}
+
 $current_page = basename($_SERVER['PHP_SELF']);
 ?>
 <!DOCTYPE html>
@@ -135,7 +148,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
   <script src="plugins/sweetalert2/sweetalert2.all.min.js"></script>
 
   <script>
-    $(function () {
+    $(function() {
       // Initialize Select2 Elements
       $('.select2').select2()
 
@@ -148,39 +161,39 @@ $current_page = basename($_SERVER['PHP_SELF']);
           "dataSrc": "data"
         },
         "columns": [{
-          "data": "id"
-        },
-        {
-          "data": "username"
-        },
-        {
-          "data": "nombre_completo"
-        },
-        {
-          "data": "especialidades",
-          "render": function (data, type, row) {
-            if (data && data.length > 0) {
-              return data.map(function (especialidad) {
-                return especialidad.nombre;
-              }).join(', ');
-            } else {
-              return 'Sin especialidades';
+            "data": "id"
+          },
+          {
+            "data": "username"
+          },
+          {
+            "data": "nombre_completo"
+          },
+          {
+            "data": "especialidades",
+            "render": function(data, type, row) {
+              if (data && data.length > 0) {
+                return data.map(function(especialidad) {
+                  return especialidad.nombre;
+                }).join(', ');
+              } else {
+                return 'Sin especialidades';
+              }
+            }
+          },
+          {
+            "data": null,
+            "render": function(data, type, row) {
+              return `<button class="btn btn-info btn-sm btn-editar" data-id="${row.id}" data-especialidades='${JSON.stringify(row.especialidades_ids)}'><i class="fas fa-pencil-alt"></i> Editar</button>`;
             }
           }
-        },
-        {
-          "data": null,
-          "render": function (data, type, row) {
-            return `<button class="btn btn-info btn-sm btn-editar" data-id="${row.id}" data-especialidades='${JSON.stringify(row.especialidades_ids)}'><i class="fas fa-pencil-alt"></i> Editar</button>`;
-          }
-        }
         ],
         "language": {
           "url": "plugins/datatables/i18n/Spanish.json"
         }
       });
 
-      $('#tabla-especialistas tbody').on('click', '.btn-editar', function () {
+      $('#tabla-especialistas tbody').on('click', '.btn-editar', function() {
         var id = $(this).data('id');
         var especialidades_actuales = $(this).data('especialidades');
 
@@ -192,9 +205,9 @@ $current_page = basename($_SERVER['PHP_SELF']);
         $.ajax({
           url: 'api/get_datos_consulta.php',
           dataType: 'json',
-          success: function (response) {
+          success: function(response) {
             if (response.status === 'success') {
-              response.data.especialidades.forEach(function (espec) {
+              response.data.especialidades.forEach(function(espec) {
                 var option = new Option(espec.nombre, espec.id, false, false);
                 especialidadesSelect.append(option);
               });
@@ -205,14 +218,14 @@ $current_page = basename($_SERVER['PHP_SELF']);
         });
       });
 
-      $('#form-editar-especialista').on('submit', function (e) {
+      $('#form-editar-especialista').on('submit', function(e) {
         e.preventDefault();
         $.ajax({
           url: 'api/editar_especialista.php',
           type: 'POST',
           data: $(this).serialize(),
           dataType: 'json',
-          success: function (response) {
+          success: function(response) {
             if (response.status === 'success') {
               $('#modal-editar-especialista').modal('hide');
               tablaEspecialistas.ajax.reload();

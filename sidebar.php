@@ -6,86 +6,69 @@
         <nav class="mt-2">
             <?php
             $current_page = basename($_SERVER['PHP_SELF']);
+            if (!isset($permisos_usuario) || !is_array($permisos_usuario)) {
+                if (session_status() === PHP_SESSION_NONE) {
+                    session_start();
+                }
+                $permisos_usuario = $_SESSION['permisos'] ?? [];
+                if (!is_array($permisos_usuario)) {
+                    $permisos_usuario = [];
+                }
+            }
+            $permisos_paginas = array_map('intval', $permisos_usuario);
 
-            $atencion_pages = ['app_atencion_admin.php', 'app_atencion_especialista.php'];
-            $is_atencion_active = in_array($current_page, $atencion_pages);
-
-            $admin_pages = ['app_pacientes.php', 'app_facturacion.php', 'app_especialistas.php', 'app_usuarios.php'];
-            $is_admin_active = in_array($current_page, $admin_pages);
+            // Definir las páginas y sus IDs
+            $paginas_menu = [
+                1 => ['file' => 'app_pacientes.php', 'icon' => 'fas fa-users', 'label' => 'Pacientes', 'group' => 'Administración'],
+                2 => ['file' => 'app_facturacion.php', 'icon' => 'fas fa-file-invoice-dollar', 'label' => 'Facturación', 'group' => 'Administración'],
+                3 => ['file' => 'app_especialistas.php', 'icon' => 'fas fa-user-md', 'label' => 'Especialistas', 'group' => 'Administración'],
+                4 => ['file' => 'app_usuarios.php', 'icon' => 'fas fa-users-cog', 'label' => 'Usuarios', 'group' => 'Sistemas'],
+                5 => ['file' => 'app_atencion_admin.php', 'icon' => 'fas fa-check-circle', 'label' => 'Validación', 'group' => 'Atención 24/7'],
+                6 => ['file' => 'app_atencion_especialista.php', 'icon' => 'fas fa-ambulance', 'label' => 'Emergencia', 'group' => 'Atención 24/7'],
+                8 => ['file' => 'app_acceso_admin.php', 'icon' => 'fas fa-user-shield', 'label' => 'Gestión de Roles', 'group' => 'Sistemas'],
+                9 => ['file' => 'app_demo.php', 'icon' => 'fas fa-qrcode', 'label' => 'Demo QR', 'group' => 'Otros'],
+            ];
+            // Agrupar por grupo
+            // Ordenar los grupos: Atención primero
+            $grupos = ['Atención 24/7' => [], 'Administración' => [], 'Sistemas' => [], 'Otros' => []];
+            foreach ($permisos_paginas as $pid) {
+                if (isset($paginas_menu[$pid])) {
+                    $grupo = $paginas_menu[$pid]['group'];
+                    $grupos[$grupo][] = $paginas_menu[$pid];
+                }
+            }
             ?>
-            <ul class="nav nav-pills nav-sidebar flex-column" id="sidebar-menu" data-widget="treeview" role="menu" data-accordion="false">
-                <!-- ...otras opciones del menú... -->
-                <li class="nav-item has-treeview<?php echo $is_atencion_active ? ' menu-open' : ''; ?>">
-                    <a href="#" class="nav-link<?php echo $is_atencion_active ? ' active sidebar-parent-active' : ''; ?>">
-                        <i class="nav-icon fas fa-first-aid"></i>
-                        <p>Atención 24/7<i class="right fas fa-angle-left"></i></p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="app_atencion_admin.php" class="nav-link<?php echo ($current_page == 'app_atencion_admin.php') ? ' active sidebar-child-active' : ''; ?>" style="padding-left:2rem;">
-                                <i class="nav-icon fas fa-check-circle"></i>
-                                <p>Validación</p>
+            <ul class="nav nav-pills nav-sidebar flex-column" id="sidebar-menu" data-widget="treeview" role="menu"
+                data-accordion="false">
+                <!-- Menú dinámico por permisos -->
+                <?php foreach ($grupos as $grupo => $items): ?>
+                    <?php if (!empty($items)): ?>
+                        <li class="nav-item has-treeview">
+                            <a href="#" class="nav-link">
+                                <?php if ($grupo === 'Administración'): ?><i
+                                        class="nav-icon fas fa-briefcase-medical"></i><?php endif; ?>
+                                <?php if ($grupo === 'Sistemas'): ?><i class="nav-icon fas fa-sliders-h"></i><?php endif; ?>
+                                <?php if ($grupo === 'Atención 24/7'): ?><i
+                                        class="nav-icon fas fa-first-aid"></i><?php endif; ?>
+                                <?php if ($grupo === 'Otros'): ?><i class="nav-icon fas fa-qrcode"></i><?php endif; ?>
+                                <p><?php echo $grupo; ?><?php if ($grupo !== 'Otros'): ?><i
+                                            class="right fas fa-angle-left"></i><?php endif; ?></p>
                             </a>
+                            <ul class="nav nav-treeview">
+                                <?php foreach ($items as $item): ?>
+                                    <li class="nav-item">
+                                        <a href="<?php echo $item['file']; ?>"
+                                            class="nav-link<?php echo ($current_page == $item['file']) ? ' active sidebar-child-active' : ''; ?>"
+                                            style="padding-left:2rem;">
+                                            <i class="nav-icon <?php echo $item['icon']; ?>"></i>
+                                            <p><?php echo $item['label']; ?></p>
+                                        </a>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
                         </li>
-                        <li class="nav-item">
-                            <a href="app_atencion_especialista.php" class="nav-link<?php echo ($current_page == 'app_atencion_especialista.php') ? ' active sidebar-child-active' : ''; ?>" style="padding-left:2rem;">
-                                <i class="nav-icon fas fa-ambulance"></i>
-                                <p>Emergencia</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-                <?php if (isset($rol) && $rol === 'admin_usuarios'): ?>
-                    <li class="nav-item has-treeview<?php echo $is_admin_active ? ' menu-open' : ''; ?>">
-                        <a href="#" class="nav-link<?php echo $is_admin_active ? ' active sidebar-parent-active' : ''; ?>">
-                            <i class="nav-icon fas fa-cogs"></i>
-                            <p>
-                                Administración
-                                <i class="right fas fa-angle-left"></i>
-                            </p>
-                        </a>
-                        <ul class="nav nav-treeview">
-                            <li class="nav-item">
-                                <a href="app_pacientes.php"
-                                    class="nav-link<?php echo ($current_page == 'app_pacientes.php') ? ' active sidebar-child-active' : ''; ?>"
-                                    style="padding-left: 2rem;">
-                                    <i class="nav-icon fas fa-users"></i>
-                                    <p>Pacientes</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="app_facturacion.php"
-                                    class="nav-link<?php echo ($current_page == 'app_facturacion.php') ? ' active sidebar-child-active' : ''; ?>"
-                                    style="padding-left: 2rem;">
-                                    <i class="nav-icon fas fa-file-invoice-dollar"></i>
-                                    <p>Facturación</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="app_especialistas.php"
-                                    class="nav-link<?php echo ($current_page == 'app_especialistas.php') ? ' active sidebar-child-active' : ''; ?>"
-                                    style="padding-left: 2rem;">
-                                    <i class="nav-icon fas fa-user-md"></i>
-                                    <p>Especialistas</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="app_usuarios.php"
-                                    class="nav-link<?php echo ($current_page == 'app_usuarios.php') ? ' active sidebar-child-active' : ''; ?>"
-                                    style="padding-left: 2rem;">
-                                    <i class="nav-icon fas fa-users-cog"></i>
-                                    <p>Usuarios</p>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                <?php endif; ?>
-                <li class="nav-item">
-                    <a href="app_demo.php" class="nav-link<?php echo ($current_page == 'app_demo.php') ? ' active sidebar-child-active' : ''; ?>">
-                        <i class="nav-icon fas fa-qrcode"></i>
-                        <p>Demo QR</p>
-                    </a>
-                </li>
+                    <?php endif; ?>
+                <?php endforeach; ?>
             </ul>
         </nav>
     </div>

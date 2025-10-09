@@ -1,4 +1,17 @@
-<?php require_once 'api/auth_check.php';
+<?php
+require_once 'api/auth_check.php';
+require_once 'api/conexion.php';
+
+$paginaRuta = basename(__FILE__);
+$stmtPagina = $pdo->prepare('SELECT id FROM paginas WHERE ruta = ? LIMIT 1');
+$stmtPagina->execute([$paginaRuta]);
+$paginaId = $stmtPagina->fetchColumn();
+
+if (!$paginaId || !in_array((int) $paginaId, $permisos_usuario, true)) {
+    header('Location: login.html');
+    exit;
+}
+
 $current_page = basename($_SERVER['PHP_SELF']);
 ?>
 <!DOCTYPE html>
@@ -12,6 +25,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
     <link rel="stylesheet" href="dist/css/adminlte.min.css">
     <link rel="stylesheet" href="css/custom.css">
+    <link rel="stylesheet" href="plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css">
     <style>
         /* Evita el cursor titilando en el área principal al hacer clic */
         .no-blink:focus {
@@ -103,68 +117,25 @@ $current_page = basename($_SERVER['PHP_SELF']);
         <?php include 'sidebar.php'; ?>
         <?php include 'modal_cambiar_contrasena.php'; ?>
         <div class="content-wrapper">
-            <section class="content pt-5">
-                <div class="container-fluid">
-                    <!-- Modal de bienvenida -->
-                    <div class="modal fade" id="bienvenidaModal" tabindex="-1" role="dialog"
-                        aria-labelledby="bienvenidaModalLabel" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered" role="document">
-                            <div class="modal-content">
-                                <div class="modal-body text-center">
-                                    <img src="logo.png" alt="Logo Clínica SaludSonrisa"
-                                        style="width:110px; margin-bottom:18px;">
-                                    <h4 class="mb-2" style="color:#007bff;">¡Bienvenido!</h4>
-                                    <div style="font-size:1.1rem; color:#333;">Has iniciado sesión en <b>Clínica
-                                            SaludSonrisa</b>.<br>¡Que tengas un excelente día!</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Modal Cambiar Contraseña -->
-                    <?php // El modal se incluye externamente arriba 
-                    ?>
-                    <!-- Contenido principal aquí -->
-                    <div class="row justify-content-center">
-                        <div class="col-12 text-center mt-5 no-blink" tabindex="-1"
-                            style="position:relative; min-height:350px;">
-                            <img src="logo.png" alt="Logo Clínica SaludSonrisa"
-                                style="opacity:0.08; position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); max-width:350px; width:80vw; pointer-events:none; z-index:0;">
-                        </div>
-                    </div>
-                </div>
-            </section>
+            <div style="height: 100vh; background: white url('multimedia/logo.jpg') no-repeat center center; background-size: 20%; opacity: 0.3; display: flex; align-items: center; justify-content: center;">
+            </div>
         </div>
     </div>
     <script src="plugins/jquery/jquery.min.js"></script>
-    <!-- (Eliminado Chart.js y scripts de resumen) -->
     <script src="js/modal_cambiar_contrasena.js"></script>
     <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="dist/js/adminlte.min.js"></script>
+    <script src="plugins/sweetalert2/sweetalert2.min.js"></script>
     <script>
-        // Solo mostrar el modal de bienvenida y ocultarlo automáticamente
         $(document).ready(function() {
-            // Ensure modals are direct children of body to avoid z-index and backdrop issues
-            $('#bienvenidaModal, #mostrarResumenModal, #resumenModal').appendTo('body');
-
-            // Helper to clean modal/backdrop state
-            function _cleanModalState() {
-                // hide any stray visible modals (except none)
-                $('.modal.show').each(function() {
-                    try {
-                        $(this).modal('hide');
-                    } catch (e) {}
-                });
-                // remove all backdrops
-                $('.modal-backdrop').remove();
-                // remove body class if no modal visible
-                $('body').removeClass('modal-open');
-            }
-            $(function() {
-                // Mostrar solo el modal de bienvenida y cerrarlo a los 3s
-                $('#bienvenidaModal').appendTo('body').modal('show');
-                setTimeout(function() {
-                    $('#bienvenidaModal').modal('hide');
-                }, 3000);
+            Swal.fire({
+                title: 'Bienvenido a Clinica SaludSonrisa',
+                text: 'Hola <?php echo htmlspecialchars($nombre_completo); ?>, has iniciado sesión exitosamente.',
+                icon: 'success',
+                confirmButtonText: 'Continuar'
             });
         });
     </script>
+</body>
+
+</html>

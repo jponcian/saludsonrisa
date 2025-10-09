@@ -2,7 +2,9 @@
 require_once 'auth_check.php';
 require_once 'conexion.php';
 header('Content-Type: application/json');
-if (isset($rol) && $rol === 'Estandar') {
+$puedeGestionarUsuarios = in_array(4, $permisos_usuario, true);
+if (!$puedeGestionarUsuarios) {
+    http_response_code(403);
     echo json_encode(['status' => 'error', 'message' => 'No tienes permisos para eliminar usuarios.']);
     exit;
 }
@@ -18,12 +20,13 @@ try {
     $pdo->beginTransaction();
 
     // Obtener el rol y el id de especialista (si aplica)
-    $stmt_rol = $pdo->prepare("SELECT rol, id FROM usuarios WHERE id = ?");
+    $stmt_rol = $pdo->prepare("SELECT u.rol AS rol_id, r.nombre AS rol_nombre FROM usuarios u LEFT JOIN roles r ON u.rol = r.id WHERE u.id = ?");
     $stmt_rol->execute([$id]);
     $usuario = $stmt_rol->fetch();
 
     if ($usuario) {
-        if ($usuario['rol'] === 'especialista') {
+        $usuario_rol_slug = rol_to_slug($usuario['rol_nombre'] ?? '');
+        if ($usuario_rol_slug === 'especialista') {
             // Buscar el id del especialista
             $stmt_esp = $pdo->prepare("SELECT id FROM especialistas WHERE usuario_id = ?");
             $stmt_esp->execute([$id]);

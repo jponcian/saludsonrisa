@@ -1,4 +1,17 @@
-<?php require_once 'api/auth_check.php'; ?>
+<?php
+require_once 'api/auth_check.php';
+require_once 'api/conexion.php';
+
+$paginaRuta = basename(__FILE__);
+$stmtPagina = $pdo->prepare('SELECT id FROM paginas WHERE ruta = ? LIMIT 1');
+$stmtPagina->execute([$paginaRuta]);
+$paginaId = $stmtPagina->fetchColumn();
+
+if (!$paginaId || !in_array((int) $paginaId, $permisos_usuario, true)) {
+    header('Location: app_inicio.php');
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="es">
 

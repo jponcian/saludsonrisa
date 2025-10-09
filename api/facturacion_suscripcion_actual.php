@@ -2,12 +2,13 @@
 require_once 'auth_check.php';
 require_once 'conexion.php';
 header('Content-Type: application/json');
-if ($rol !== 'admin_usuarios') {
+$puedeGestionarFacturacion = in_array(2, $permisos_usuario, true);
+if (!$puedeGestionarFacturacion) {
     http_response_code(403);
     echo json_encode(['status' => 'error', 'message' => 'No autorizado']);
     exit;
 }
-$id_paciente = isset($_GET['id_paciente']) ? (int)$_GET['id_paciente'] : 0;
+$id_paciente = isset($_GET['id_paciente']) ? (int) $_GET['id_paciente'] : 0;
 if (!$id_paciente) {
     echo json_encode(['status' => 'error', 'message' => 'Paciente requerido']);
     exit;
@@ -17,13 +18,13 @@ try {
     $tableExists = function ($name) use ($pdo) {
         $q = $pdo->prepare("SELECT 1 FROM information_schema.tables WHERE table_schema=DATABASE() AND table_name=? LIMIT 1");
         $q->execute([$name]);
-        return (bool)$q->fetchColumn();
+        return (bool) $q->fetchColumn();
     };
     $colExists = function ($table, $col) use ($pdo) {
         try {
             $q = $pdo->prepare("SELECT 1 FROM information_schema.columns WHERE table_schema=DATABASE() AND table_name=? AND column_name=? LIMIT 1");
             $q->execute([$table, $col]);
-            return (bool)$q->fetchColumn();
+            return (bool) $q->fetchColumn();
         } catch (Exception $e) {
             return false;
         }

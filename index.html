@@ -20,6 +20,60 @@
     <link rel="stylesheet" href="dist/css/adminlte.min.css" />
 
     <link rel="stylesheet" href="css/custom.css" />
+
+    <style>
+      /* Estilos para el hero con video al 50% y efectos de vidrio en los lados */
+      .hero-video-wrapper {
+        position: relative;
+        width: 100%;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      .hero-video {
+        width: 50%;
+        height: 100%;
+        object-fit: cover;
+        position: absolute;
+        left: 25%;
+        top: 0;
+        z-index: 1;
+      }
+
+      .hero-side {
+        position: absolute;
+        top: 0;
+        height: 100%;
+        width: 25%;
+        background: url("multimedia/principal_completo.jpg") center center /
+          cover no-repeat;
+        filter: blur(10px);
+        z-index: 0;
+      }
+
+      .hero-side-left {
+        left: 0;
+      }
+
+      .hero-side-right {
+        right: 0;
+      }
+
+      .hero-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 2;
+      }
+
+      .hero-content {
+        position: relative;
+        z-index: 3;
+      }
+    </style>
   </head>
 
   <body>
@@ -53,6 +107,10 @@
 
     <section class="hero-section">
       <div class="hero-video-wrapper">
+        <!-- Lado izquierdo con efecto de vidrio (blur) -->
+        <div class="hero-side hero-side-left"></div>
+
+        <!-- Video central al 50% -->
         <video
           id="heroVideo"
           class="hero-video"
@@ -67,6 +125,10 @@
           <source src="multimedia/video.mp4" type="video/mp4" />
           <!-- Si tu archivo tiene otro nombre, cámbialo aquí -->
         </video>
+
+        <!-- Lado derecho con efecto de vidrio (blur) -->
+        <div class="hero-side hero-side-right"></div>
+
         <div class="hero-overlay"></div>
         <div class="container hero-content hero-content--center">
           <h1 class="hero-highlight">Bienvenidos a Clínica SaludSonrisa</h1>
@@ -78,7 +140,7 @@
               >Acceso Personal</a
             >
             <a
-              href="#specialtiesCarousel"
+              href="#services-section"
               class="btn btn-outline-light btn-lg ml-2"
               >Nuestras Especialidades</a
             >
@@ -119,10 +181,10 @@
                 <div class="plan-card p-3 text-center h-100">
                   <h5 class="plan-name">Premium</h5>
                   <div class="plan-price-sub">
-                    Suscripción: <strong>$180.00</strong>
+                    Suscripción: <strong>$60</strong>
                   </div>
                   <div class="plan-price-month">
-                    Mensualidad: <strong>$60.00</strong>
+                    Mensualidad: <strong>$180</strong>
                   </div>
                   <ul class="plan-features mt-3">
                     <li>Atención prioritaria</li>
@@ -137,10 +199,10 @@
                 <div class="plan-card p-3 text-center h-100">
                   <h5 class="plan-name">Plus</h5>
                   <div class="plan-price-sub">
-                    Suscripción: <strong>$120.00</strong>
+                    Suscripción: <strong>$60</strong>
                   </div>
                   <div class="plan-price-month">
-                    Mensualidad: <strong>$40.00</strong>
+                    Mensualidad: <strong>$36</strong>
                   </div>
                   <ul class="plan-features mt-3">
                     <li>Atención rápida</li>
@@ -155,10 +217,10 @@
                 <div class="plan-card p-3 text-center h-100">
                   <h5 class="plan-name">Salud</h5>
                   <div class="plan-price-sub">
-                    Suscripción: <strong>$60.00</strong>
+                    Suscripción: <strong>$60</strong>
                   </div>
                   <div class="plan-price-month">
-                    Mensualidad: <strong>$20.00</strong>
+                    Mensualidad: <strong>$21</strong>
                   </div>
                   <ul class="plan-features mt-3">
                     <li>Atención básica</li>
@@ -189,7 +251,7 @@
     </section>
 
     <!-- Services Section -->
-    <section class="services-section">
+    <section id="services-section" class="services-section">
       <div class="container">
         <h2 class="section-title">Nuestras Especialidades</h2>
 

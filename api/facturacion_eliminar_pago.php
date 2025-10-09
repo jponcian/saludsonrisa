@@ -2,12 +2,13 @@
 require_once 'auth_check.php';
 require_once 'conexion.php';
 header('Content-Type: application/json');
-if ($rol !== 'admin_usuarios') {
+$puedeGestionarFacturacion = in_array(2, $permisos_usuario, true);
+if (!$puedeGestionarFacturacion) {
     http_response_code(403);
     echo json_encode(['status' => 'error', 'message' => 'No autorizado']);
     exit;
 }
-$id = (int)($_POST['id'] ?? 0);
+$id = (int) ($_POST['id'] ?? 0);
 if (!$id) {
     echo json_encode(['status' => 'error', 'message' => 'ID de pago requerido']);
     exit;

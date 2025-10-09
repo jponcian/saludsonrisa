@@ -12,8 +12,7 @@ try {
     $sql = "SELECT c.fecha_consulta AS fecha, 'consulta' AS tipo, c.diagnostico AS detalle,
                    u.nombre_completo AS especialista
             FROM consultas c 
-            LEFT JOIN especialistas e ON e.id = c.especialista_id
-            LEFT JOIN usuarios u ON u.id = e.usuario_id
+            LEFT JOIN usuarios u ON u.id = c.especialista_id
             WHERE c.paciente_id=?
             UNION ALL
             SELECT sc.created_at AS fecha, sc.tipo_servicio AS tipo, sc.notas AS detalle,

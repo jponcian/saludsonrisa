@@ -4,7 +4,8 @@ require_once 'auth_check.php';
 
 try {
     // Solo usuarios autorizados (ajustar rol si es necesario)
-    if (!isset($rol) || ($rol !== 'admin_usuarios' && $rol !== 'admin')) {
+    $puedeGestionarAtencion = in_array(5, $permisos_usuario, true);
+    if (!$puedeGestionarAtencion) {
         http_response_code(403);
         echo json_encode(['status' => 'error', 'message' => 'No autorizado']);
         exit;
@@ -30,7 +31,8 @@ try {
         throw new Exception('Archivo de conexión no encontrado');
     }
     require_once $connFile;
-    if (!isset($pdo)) throw new Exception('Conexión PDO no inicializada');
+    if (!isset($pdo))
+        throw new Exception('Conexión PDO no inicializada');
 
     // Verificar existencia
     $check = $pdo->prepare('SELECT id FROM atencion_procesos WHERE id = :id LIMIT 1');

@@ -2,7 +2,9 @@
 require_once 'auth_check.php';
 require_once 'conexion.php';
 header('Content-Type: application/json');
-if ($rol === 'Estandar') {
+$puedeEliminarConsulta = in_array(6, $permisos_usuario, true) || in_array(5, $permisos_usuario, true);
+if (!$puedeEliminarConsulta) {
+    http_response_code(403);
     echo json_encode(['status' => 'error', 'message' => 'No tienes permisos para eliminar consultas.']);
     exit;
 }

@@ -2,18 +2,21 @@
 require_once 'auth_check.php';
 require_once 'conexion.php';
 header('Content-Type: application/json');
-if ($rol !== 'admin_usuarios') {
+$puedeGestionarAtencion = in_array(5, $permisos_usuario, true);
+if (!$puedeGestionarAtencion) {
     http_response_code(403);
     echo json_encode(['status' => 'error', 'message' => 'No autorizado']);
     exit;
 }
-$id_paciente = isset($_POST['id_paciente']) ? (int)$_POST['id_paciente'] : 0;
-if ($rol === 'admin_usuarios') {
+$id_paciente = isset($_POST['id_paciente']) ? (int) $_POST['id_paciente'] : 0;
+
+$motivo = trim($_POST['motivo'] ?? '');
+$urgencia = trim($_POST['urgencia'] ?? '');
+if ($motivo === '') {
     $motivo = 'APERTURA ADMIN';
+}
+if ($urgencia === '') {
     $urgencia = 'programada';
-} else {
-    $motivo = trim($_POST['motivo'] ?? '');
-    $urgencia = trim($_POST['urgencia'] ?? '');
 }
 
 $obs = trim($_POST['obs'] ?? '');

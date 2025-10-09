@@ -2,3 +2,53 @@
 2025-09-30 21:49:13 - editar_paciente.php - No se encontró el paciente con ID: 12 o no hubo cambios.
 2025-09-30 21:51:41 - editar_paciente.php - No se encontró el paciente con ID: 12 o no hubo cambios.
 2025-09-30 21:51:54 - editar_paciente.php - No se encontró el paciente con ID: 12 o no hubo cambios.
+2025-10-08 23:37:58 POST: Array
+(
+    [id_paciente] => 6
+    [proceso_id] => 6
+    [diagnostico] => Diagnóstico
+    [procedimiento] => Procedimiento / Tratamiento
+    [indicaciones] => Indicaciones
+    [items_plan] => Array
+        (
+            [0] => atenciones_primarias
+            [1] => inmovilizaciones
+            [2] => rayos_x
+        )
+
+)
+ items_plan: Array
+(
+    [0] => atenciones_primarias
+    [1] => inmovilizaciones
+    [2] => rayos_x
+)
+
+2025-10-08 23:37:58 Descontando código: atenciones_primarias
+2025-10-08 23:37:58 Descontando código: inmovilizaciones
+2025-10-08 23:37:58 Descontando código: rayos_x
+2025-10-08 23:48:45 POST: Array
+(
+    [id_paciente] => 6
+    [proceso_id] => 7
+    [diagnostico] => Diagnóstico *
+    [procedimiento] => Tratamiento
+    [indicaciones] => Indicaciones
+    [items_plan] => Array
+        (
+            [0] => atenciones_primarias
+            [1] => consultas_por_emergencia
+            [2] => observaciones_por_emergencia
+        )
+
+)
+ items_plan: Array
+(
+    [0] => atenciones_primarias
+    [1] => consultas_por_emergencia
+    [2] => observaciones_por_emergencia
+)
+
+2025-10-08 23:48:46 Descontando código: atenciones_primarias
+2025-10-08 23:48:46 Descontando código: consultas_por_emergencia
+2025-10-08 23:48:46 Descontando código: observaciones_por_emergencia
