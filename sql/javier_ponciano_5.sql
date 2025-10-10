@@ -11,7 +11,7 @@
  Target Server Version : 80300
  File Encoding         : 65001
 
- Date: 09/10/2025 20:38:54
+ Date: 10/10/2025 07:19:49
 */
 
 SET NAMES utf8mb4;
@@ -62,13 +62,14 @@ CREATE TABLE `atencion_procesos`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_paciente`(`paciente_id`) USING BTREE,
   INDEX `idx_estado`(`estado`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 8 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 9 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of atencion_procesos
 -- ----------------------------
 INSERT INTO `atencion_procesos` VALUES (6, 6, NULL, NULL, 'APERTURA ADMIN', '', 'Observaciones', 'cerrado', 'guardia', 0, NULL, NULL, NULL, NULL, '2025-10-08 23:27:59', '2025-10-08 23:44:40', '2025-10-08 23:44:40');
 INSERT INTO `atencion_procesos` VALUES (7, 6, NULL, NULL, 'APERTURA ADMIN', '', 'Observaciones', 'cerrado', 'guardia', 0, NULL, NULL, NULL, NULL, '2025-10-08 23:45:08', '2025-10-08 23:48:51', '2025-10-08 23:48:51');
+INSERT INTO `atencion_procesos` VALUES (8, 6, NULL, NULL, 'APERTURA ADMIN', '', 'Observaciones', 'cerrado', 'guardia', 0, NULL, NULL, NULL, NULL, '2025-10-09 22:11:21', '2025-10-09 22:32:04', '2025-10-09 22:32:04');
 
 -- ----------------------------
 -- Table structure for consulta_especialidades
@@ -119,13 +120,15 @@ CREATE TABLE `consultas`  (
   INDEX `paciente_id`(`paciente_id`) USING BTREE,
   INDEX `especialista_id`(`especialista_id`) USING BTREE,
   INDEX `idx_consulta_proceso`(`proceso_id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 23 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 25 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of consultas
 -- ----------------------------
 INSERT INTO `consultas` VALUES (21, 6, 1, '2025-10-08 23:37:58', 'Diagnóstico', 'Procedimiento / Tratamiento', 'Indicaciones', 6, NULL, NULL);
 INSERT INTO `consultas` VALUES (22, 6, 1, '2025-10-08 23:48:46', 'Diagnóstico *', 'Tratamiento', 'Indicaciones', 7, NULL, NULL);
+INSERT INTO `consultas` VALUES (23, 6, 1, '2025-10-09 22:13:00', 'Diagnóstico', 'Procedimiento / Tratamiento', 'Indicaciones', 8, NULL, NULL);
+INSERT INTO `consultas` VALUES (24, 6, 1, '2025-10-09 22:31:56', 'Diagnóstico', 'Procedimiento / Tratamiento', 'Indicaciones', 8, NULL, NULL);
 
 -- ----------------------------
 -- Table structure for demo_asistencias
@@ -493,20 +496,21 @@ CREATE TABLE `paginas`  (
   `activo` tinyint(1) NULL DEFAULT 1,
   `grupo` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT 'Otros',
   `orden` int NULL DEFAULT 0,
+  `icon` varchar(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT 'fas fa-file',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = MyISAM AUTO_INCREMENT = 11 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of paginas
 -- ----------------------------
-INSERT INTO `paginas` VALUES (1, 'Pacientes', 'app_pacientes.php', 1, 'Administración', 1);
-INSERT INTO `paginas` VALUES (3, 'Usuarios', 'app_usuarios.php', 1, 'Sistemas', 1);
-INSERT INTO `paginas` VALUES (4, 'Reunión QR', 'app_demo.php', 1, 'Otros', 1);
-INSERT INTO `paginas` VALUES (5, 'Validacion', 'app_atencion_admin.php', 1, 'Atención 24/7', 1);
-INSERT INTO `paginas` VALUES (6, 'Atención', 'app_atencion_especialista.php', 1, 'Atención 24/7', 2);
-INSERT INTO `paginas` VALUES (8, 'Gestion Roles', 'app_acceso_admin.php', 1, 'Sistemas', 2);
-INSERT INTO `paginas` VALUES (9, 'Facturación', 'app_facturacion.php', 1, 'Administración', 2);
-INSERT INTO `paginas` VALUES (10, 'Especialistas', 'app_especialistas.php', 1, 'Administración', 3);
+INSERT INTO `paginas` VALUES (1, 'Pacientes', 'app_pacientes.php', 1, 'Administración', 1, 'fas fa-users');
+INSERT INTO `paginas` VALUES (3, 'Usuarios', 'app_usuarios.php', 1, 'Sistemas', 1, 'fas fa-users-cog');
+INSERT INTO `paginas` VALUES (4, 'Reunión QR', 'app_demo.php', 1, 'Otros', 1, 'fas fa-qrcode');
+INSERT INTO `paginas` VALUES (5, 'Validacion', 'app_atencion_admin.php', 1, 'Atención 24/7', 1, 'fas fa-first-aid');
+INSERT INTO `paginas` VALUES (6, 'Atención', 'app_atencion_especialista.php', 1, 'Atención 24/7', 2, 'fas fa-ambulance');
+INSERT INTO `paginas` VALUES (8, 'Gestion Roles', 'app_acceso_admin.php', 1, 'Sistemas', 2, 'fas fa-user-shield');
+INSERT INTO `paginas` VALUES (9, 'Facturación', 'app_facturacion.php', 1, 'Administración', 2, 'fas fa-file-invoice-dollar');
+INSERT INTO `paginas` VALUES (10, 'Especialistas', 'app_especialistas.php', 1, 'Administración', 3, 'fas fa-user-md');
 
 -- ----------------------------
 -- Table structure for plan_pagos
@@ -554,6 +558,7 @@ CREATE TABLE `plan_suscripciones`  (
   `notas` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
   `creado_en` datetime NULL DEFAULT CURRENT_TIMESTAMP,
   `actualizado_en` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `numero` int NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_paciente`(`paciente_id`) USING BTREE,
   INDEX `idx_plan`(`plan_id`) USING BTREE,
@@ -564,8 +569,8 @@ CREATE TABLE `plan_suscripciones`  (
 -- ----------------------------
 -- Records of plan_suscripciones
 -- ----------------------------
-INSERT INTO `plan_suscripciones` VALUES (2, 1, 2, NULL, '2025-10-01', '2025-11-15', 45, 'pendiente', 1, 40.00, 120.00, '', '2025-10-01 21:46:23', '2025-10-01 21:46:23');
-INSERT INTO `plan_suscripciones` VALUES (3, 6, 3, NULL, '2025-10-05', '2025-11-19', 45, 'pendiente', 1, 20.00, 60.00, '', '2025-10-05 23:41:22', '2025-10-05 23:41:22');
+INSERT INTO `plan_suscripciones` VALUES (2, 1, 2, NULL, '2025-10-01', '2025-11-15', 45, 'pendiente', 1, 40.00, 120.00, '', '2025-10-01 21:46:23', '2025-10-01 21:46:23', 0);
+INSERT INTO `plan_suscripciones` VALUES (3, 6, 3, NULL, '2025-10-05', '2025-11-19', 45, 'pendiente', 1, 20.00, 60.00, '', '2025-10-05 23:41:22', '2025-10-10 06:54:47', 1);
 
 -- ----------------------------
 -- Table structure for plan_suscripciones_historial
@@ -718,7 +723,7 @@ CREATE TABLE `servicios_consumidos`  (
   `estado` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
   `codigo_limite` varchar(60) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = MyISAM AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = MyISAM AUTO_INCREMENT = 11 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of servicios_consumidos
@@ -729,6 +734,10 @@ INSERT INTO `servicios_consumidos` VALUES (3, 6, 'Rayos X', NULL, 1, 1, '2025-10
 INSERT INTO `servicios_consumidos` VALUES (4, 6, 'Atenciones Primarias', NULL, 1, 1, '2025-10-08 23:48:46', 'registrado', 'atenciones_primarias');
 INSERT INTO `servicios_consumidos` VALUES (5, 6, 'Consultas por Emergencia', NULL, 1, 1, '2025-10-08 23:48:46', 'registrado', 'consultas_por_emergencia');
 INSERT INTO `servicios_consumidos` VALUES (6, 6, 'Observaciones por emergencia', NULL, 1, 1, '2025-10-08 23:48:46', 'registrado', 'observaciones_por_emergencia');
+INSERT INTO `servicios_consumidos` VALUES (7, 6, 'Atenciones Primarias', NULL, 1, 1, '2025-10-09 22:13:00', 'registrado', 'atenciones_primarias');
+INSERT INTO `servicios_consumidos` VALUES (8, 6, 'Laboratorios', NULL, 1, 1, '2025-10-09 22:13:00', 'registrado', 'laboratorios');
+INSERT INTO `servicios_consumidos` VALUES (9, 6, 'Observaciones por emergencia', NULL, 1, 1, '2025-10-09 22:31:56', 'registrado', 'observaciones_por_emergencia');
+INSERT INTO `servicios_consumidos` VALUES (10, 6, 'Cirugías menores', NULL, 1, 1, '2025-10-09 22:31:56', 'registrado', 'cirugías_menores');
 
 -- ----------------------------
 -- Table structure for usuarios
