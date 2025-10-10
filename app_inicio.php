@@ -1,18 +1,13 @@
 <?php
-require_once 'api/auth_check.php';
-require_once 'api/conexion.php';
-
-$paginaRuta = basename(__FILE__);
-$stmtPagina = $pdo->prepare('SELECT id FROM paginas WHERE ruta = ? LIMIT 1');
-$stmtPagina->execute([$paginaRuta]);
-$paginaId = $stmtPagina->fetchColumn();
-
-if (!$paginaId || !in_array((int) $paginaId, $permisos_usuario, true)) {
-    header('Location: login.html');
-    exit;
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
 }
-
+// No validar permisos en la página de inicio
 $current_page = basename($_SERVER['PHP_SELF']);
+// Asegurar que $nombre_completo esté definido
+if (!isset($nombre_completo)) {
+    $nombre_completo = $_SESSION['nombre_completo'] ?? '';
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -130,7 +125,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
         $(document).ready(function() {
             Swal.fire({
                 title: 'Bienvenido a Clinica SaludSonrisa',
-                text: 'Hola <?php echo htmlspecialchars($nombre_completo); ?>, has iniciado sesión exitosamente.',
+                html: 'Hola <strong><?php echo htmlspecialchars($nombre_completo); ?></strong>, has iniciado sesión exitosamente.',
                 icon: 'success',
                 confirmButtonText: 'Continuar'
             });

@@ -1,3 +1,11 @@
+/* Forzar degradado azul-verde en el enlace hijo activo del sidebar */
+.nav-link.sidebar-child-active,
+.nav-link.active.sidebar-child-active {
+  background: linear-gradient(90deg, #2196f3 0%, #43e97b 100%) !important;
+  color: #fff !important;
+  font-weight: bold;
+  border-radius: 0.25rem;
+}
 .sidebar-dark-primary
   .nav-sidebar.nav-pills
   .nav-item

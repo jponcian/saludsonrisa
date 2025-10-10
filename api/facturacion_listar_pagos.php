@@ -2,10 +2,12 @@
 require_once 'auth_check.php';
 require_once 'conexion.php';
 header('Content-Type: application/json');
-$puedeGestionarFacturacion = in_array(2, $permisos_usuario, true);
-if (!$puedeGestionarFacturacion) {
-    http_response_code(403);
-    echo json_encode(['status' => 'error', 'message' => 'No autorizado']);
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+if (empty($_SESSION['usuario_id'])) {
+    http_response_code(401);
+    echo json_encode(['status' => 'error', 'message' => 'No ha iniciado sesión']);
     exit;
 }
 $id_paciente = isset($_GET['id_paciente']) ? (int) $_GET['id_paciente'] : 0;

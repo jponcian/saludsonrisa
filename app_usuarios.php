@@ -89,7 +89,7 @@ if (!$paginaId || !in_array((int) $paginaId, $permisos_usuario, true)) {
           <div class="row">
             <div class="col-12">
               <div class="card">
-                <div class="card-header">
+                <div class="card-header modal-header-gradient-blue-green">
                   <h3 class="card-title">Listado de Usuarios del Sistema</h3>
                   <div class="card-tools"><button type="button" class="btn btn-primary" data-toggle="modal"
                       data-target="#modal-registrar-usuario"><i class="fas fa-plus"></i> Registrar Nuevo

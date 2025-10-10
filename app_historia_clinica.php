@@ -2,15 +2,15 @@
 require_once 'api/auth_check.php';
 require_once 'api/conexion.php';
 
-$paginaRuta = basename(__FILE__);
-$stmtPagina = $pdo->prepare('SELECT id FROM paginas WHERE ruta = ? LIMIT 1');
-$stmtPagina->execute([$paginaRuta]);
-$paginaId = $stmtPagina->fetchColumn();
+// $paginaRuta = basename(__FILE__);
+// $stmtPagina = $pdo->prepare('SELECT id FROM paginas WHERE ruta = ? LIMIT 1');
+// $stmtPagina->execute([$paginaRuta]);
+// $paginaId = $stmtPagina->fetchColumn();
 
-if (!$paginaId || !in_array((int) $paginaId, $permisos_usuario, true)) {
-    header('Location: app_inicio.php');
-    exit;
-}
+// if (!$paginaId || !in_array((int) $paginaId, $permisos_usuario, true)) {
+//     header('Location: app_inicio.php');
+//     exit;
+// }
 
 $paciente_id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 if ($paciente_id <= 0) {

@@ -52,3 +52,47 @@
 2025-10-08 23:48:46 Descontando código: atenciones_primarias
 2025-10-08 23:48:46 Descontando código: consultas_por_emergencia
 2025-10-08 23:48:46 Descontando código: observaciones_por_emergencia
+2025-10-09 22:13:00 POST: Array
+(
+    [id_paciente] => 6
+    [proceso_id] => 8
+    [diagnostico] => Diagnóstico
+    [procedimiento] => Procedimiento / Tratamiento
+    [indicaciones] => Indicaciones
+    [items_plan] => Array
+        (
+            [0] => atenciones_primarias
+            [1] => laboratorios
+        )
+
+)
+ items_plan: Array
+(
+    [0] => atenciones_primarias
+    [1] => laboratorios
+)
+
+2025-10-09 22:13:00 Descontando código: atenciones_primarias
+2025-10-09 22:13:00 Descontando código: laboratorios
+2025-10-09 22:31:56 POST: Array
+(
+    [id_paciente] => 6
+    [proceso_id] => 8
+    [diagnostico] => Diagnóstico
+    [procedimiento] => Procedimiento / Tratamiento
+    [indicaciones] => Indicaciones
+    [items_plan] => Array
+        (
+            [0] => observaciones_por_emergencia
+            [1] => cirugías_menores
+        )
+
+)
+ items_plan: Array
+(
+    [0] => observaciones_por_emergencia
+    [1] => cirugías_menores
+)
+
+2025-10-09 22:31:56 Descontando código: observaciones_por_emergencia
+2025-10-09 22:31:56 Descontando código: cirugías_menores

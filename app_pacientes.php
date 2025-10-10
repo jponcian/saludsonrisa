@@ -125,7 +125,7 @@ if ($rol === 'especialista') {
           <div class="row">
             <div class="col-12">
               <div class="card">
-                <div class="card-header">
+                <div class="card-header modal-header-gradient-blue-green">
                   <h3 class="card-title">Listado de Pacientes Registrados</h3>
                   <div class="card-tools"><button type="button" class="btn btn-primary" data-toggle="modal"
                       data-target="#modal-registrar-paciente"><i class="fas fa-plus"></i> Registrar Nuevo
@@ -295,7 +295,10 @@ if ($rol === 'especialista') {
               aria-label="Close"><span aria-hidden="true">&times;</span></button>
           </div>
           <div class="modal-body" id="historial-paciente-body"></div>
-          <div class="modal-footer"><button type="button" class="btn btn-info" data-dismiss="modal">Cerrar</button>
+          <div class="modal-footer"> <button type="button" class="btn btn-success" id="btn-generar-carnet" style="display:none;">
+              <i class="fas fa-id-card"></i> Generar Carnet
+            </button>
+            <button type="button" class="btn btn-info" data-dismiss="modal">Cerrar</button>
           </div>
         </div>
       </div>
@@ -543,10 +546,12 @@ if ($rol === 'especialista') {
               render: function(data, type, row) {
                 var patientData = JSON.stringify(row);
                 var historiaBtnClass = (row.historia_estado === 'completado') ? 'btn btn-success btn-sm btn-historia-clinica' : 'btn btn-secondary btn-sm btn-historia-clinica';
-                // var html = "<button class='btn btn-success btn-sm btn-crear-consulta' data-paciente='" + patientData + "'>Crear Consulta</button> " +
                 var html = "<button class='btn btn-info btn-sm btn-ver-paciente' data-id='" + row.id + "' data-toggle='tooltip' data-placement='top' title='Ver paciente'><i class='fas fa-eye'></i></button> " +
                   "<a class='" + historiaBtnClass + "' href='app_historia_clinica.php?id=" + row.id + "' data-toggle='tooltip' data-placement='top' title='Historia clínica'><i class='fas fa-notes-medical'></i></a> " +
                   "<button class='btn btn-warning btn-sm btn-editar-paciente' data-paciente='" + patientData + "' data-toggle='tooltip' data-placement='top' title='Editar paciente'><i class='fas fa-edit'></i></button>";
+                if (row.afiliacion_pagada) {
+                  html += " <button class='btn btn-success btn-sm btn-ver-carnet' data-id='" + row.id + "' data-toggle='tooltip' data-placement='top' title='Ver carnet'><i class='fas fa-id-card'></i></button>";
+                }
                 if (usuarioRol !== 'Estandar') {
                   html += " <button class='btn btn-danger btn-sm btn-eliminar-paciente' data-id='" + row.id + "' data-toggle='tooltip' data-placement='top' title='Eliminar paciente'><i class='fas fa-trash'></i></button>";
                 }
@@ -556,6 +561,15 @@ if ($rol === 'especialista') {
           ],
           language: {
             url: "plugins/datatables/i18n/Spanish.json"
+          }
+        });
+
+        // Abrir carnet en nueva pestaña desde el listado
+        $('#tabla-pacientes tbody').on('click', '.btn-ver-carnet', function() {
+          var pacienteId = $(this).data('id');
+          if (pacienteId) {
+            var encryptedId = btoa(pacienteId + '|saludsonrisa2025');
+            window.open('formatos/carnet.php?id=' + encodeURIComponent(encryptedId), '_blank');
           }
         });
 
@@ -767,6 +781,15 @@ if ($rol === 'especialista') {
           $('#modal-editar-paciente').modal('show');
         });
         // ...existing code...
+        // Abrir carnet en nueva pestaña con QR al hacer clic en el botón
+        $('#btn-generar-carnet').on('click', function() {
+          var pacienteId = $('#modal-ver-paciente').data('paciente-id');
+          if (pacienteId) {
+            var encryptedId = btoa(pacienteId + '|saludsonrisa2025');
+            window.open('formatos/carnet.php?id=' + encodeURIComponent(encryptedId), '_blank');
+          }
+          // Función para desencriptar el id en PHP: base64_decode y luego explode('|', $str)[0]
+        });
 
         $('#tabla-pacientes tbody').on('click', '.btn-crear-consulta', function() {
           var data = $(this).data('paciente');
@@ -880,6 +903,21 @@ if ($rol === 'especialista') {
       function cargarHistorialPaciente(pacienteId) {
         var modalBody = $('#historial-paciente-body');
         modalBody.html('<div class="text-center"><i class="fas fa-2x fa-sync-alt fa-spin"></i><p>Cargando...</p></div>');
+        // Verificar si el paciente tiene pago de afiliación suficiente
+        $.get('api/facturacion_listar_pagos.php?id_paciente=' + pacienteId, function(respPagos) {
+          var puedeGenerarCarnet = false;
+          if (respPagos.status === 'ok' && Array.isArray(respPagos.data)) {
+            var pagosAfiliacion = respPagos.data.filter(function(p) {
+              return p.tipo === 'inscripcion' || p.tipo === 'inscripcion_diferencia';
+            });
+            var montoTotal = pagosAfiliacion.reduce(function(sum, p) {
+              return sum + parseFloat(p.monto);
+            }, 0);
+            // Aquí puedes definir el monto mínimo requerido
+            puedeGenerarCarnet = montoTotal >= 1; // Cambia 1 por el monto mínimo real
+          }
+          $('#btn-generar-carnet').toggle(puedeGenerarCarnet);
+        }, 'json');
         $.ajax({
           url: 'api/get_paciente_historial.php?id=' + encodeURIComponent(pacienteId),
           dataType: 'json',

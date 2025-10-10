@@ -51,13 +51,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['guardar_accesos'])) {
 
 // Procesar la creación de una nueva página
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['crear_pagina'])) {
-    $nombre = $_POST['nombre_pagina'];
-    $ruta = $_POST['ruta_pagina'];
+    $nombre = trim($_POST['nombre_pagina']);
+    $ruta = trim($_POST['ruta_pagina']);
+    $icono = trim($_POST['icono_pagina'] ?? '');
     $activo = isset($_POST['activa_pagina']) ? 1 : 0;
 
     if (!empty($nombre) && !empty($ruta)) {
-        $stmt = $pdo->prepare('INSERT INTO paginas (nombre, ruta, activo) VALUES (?, ?, ?)');
-        $stmt->execute([$nombre, $ruta, $activo]);
+        if ($icono === '') {
+            $icono = 'fas fa-file';
+        }
+        $stmt = $pdo->prepare('INSERT INTO paginas (nombre, ruta, activo, icon) VALUES (?, ?, ?, ?)');
+        $stmt->execute([$nombre, $ruta, $activo, $icono]);
         $msg = "Página '<strong>" . htmlspecialchars($nombre) . "</strong>' creada exitosamente.";
         // Recargar las páginas para mostrar la nueva
         $paginas = $pdo->query('SELECT * FROM paginas ORDER BY nombre')->fetchAll(PDO::FETCH_ASSOC);
@@ -70,12 +74,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['crear_pagina'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['actualizar_pagina'])) {
     $id = $_POST['id_pagina_edit'];
     $nombre = $_POST['nombre_pagina_edit'];
-    $ruta = $_POST['ruta_pagina_edit'];
+    $ruta = trim($_POST['ruta_pagina_edit']);
+    $icono = trim($_POST['icono_pagina_edit'] ?? '');
     $activo = isset($_POST['activa_pagina_edit']) ? 1 : 0;
 
     if (!empty($id) && !empty($nombre) && !empty($ruta)) {
-        $stmt = $pdo->prepare('UPDATE paginas SET nombre = ?, ruta = ?, activo = ? WHERE id = ?');
-        $stmt->execute([$nombre, $ruta, $activo, $id]);
+        if ($icono === '') {
+            $icono = 'fas fa-file';
+        }
+        $stmt = $pdo->prepare('UPDATE paginas SET nombre = ?, ruta = ?, icon = ?, activo = ? WHERE id = ?');
+        $stmt->execute([$nombre, $ruta, $icono, $activo, $id]);
         $msg = "Página '<strong>" . htmlspecialchars($nombre) . "</strong>' actualizada exitosamente.";
         // Recargar las páginas para mostrar los cambios
         $paginas = $pdo->query('SELECT * FROM paginas ORDER BY nombre')->fetchAll(PDO::FETCH_ASSOC);
@@ -123,6 +131,7 @@ foreach ($rows as $row) {
     <link rel="stylesheet" href="plugins/fontawesome-free/css/all.min.css">
     <link rel="stylesheet" href="dist/css/adminlte.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="css/custom.css">
     <style>
         .modal-header-gradient-blue-green {
             background: linear-gradient(to right, #007bff, #28a745);
@@ -138,6 +147,29 @@ foreach ($rows as $row) {
 
 <body class="hold-transition sidebar-mini">
     <div class="wrapper">
+        <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a></li>
+            </ul>
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link" data-toggle="dropdown" href="#">
+                        <i class="fas fa-user"></i> <?php echo htmlspecialchars($nombre_completo); ?>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                        <span class="dropdown-item dropdown-header">Opciones de Usuario</span>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" class="dropdown-item" data-toggle="modal" data-target="#modal-cambiar-contrasena">
+                            <i class="fas fa-key mr-2"></i> Cambiar Contraseña
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="api/logout.php" class="dropdown-item">
+                            <i class="fas fa-sign-out-alt mr-2"></i> Cerrar Sesión
+                        </a>
+                    </div>
+                </li>
+            </ul>
+        </nav>
         <?php include 'sidebar.php'; // Menú lateral 
         ?>
 
@@ -180,6 +212,7 @@ foreach ($rows as $row) {
                                                         <div class="form-check">
                                                             <input class="form-check-input" type="checkbox" name="paginas[]" value="<?php echo $p['id']; ?>" id="pagina_<?php echo $p['id']; ?>">
                                                             <label class="form-check-label" for="pagina_<?php echo $p['id']; ?>">
+                                                                <i class="<?php echo htmlspecialchars($p['icon'] ?? 'fas fa-file'); ?> mr-1"></i>
                                                                 <?php echo htmlspecialchars($p['nombre']); ?>
                                                                 <small class="text-muted">(<?php echo htmlspecialchars($p['ruta']); ?>)</small>
                                                             </label>
@@ -215,6 +248,11 @@ foreach ($rows as $row) {
                                         <div class="form-group">
                                             <label for="ruta_pagina">Ruta del Archivo</label>
                                             <input type="text" name="ruta_pagina" id="ruta_pagina" class="form-control" placeholder="ej: app_nueva_pagina.php" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="icono_pagina">Icono (clase Font Awesome)</label>
+                                            <input type="text" name="icono_pagina" id="icono_pagina" class="form-control" placeholder="ej: fas fa-user-shield">
+                                            <small class="form-text text-muted">Ejemplos: <code>fas fa-user</code>, <code>fas fa-hospital</code>. Si se deja vacío se usará <code>fas fa-file</code>.</small>
                                         </div>
                                         <div class="form-check">
                                             <input type="checkbox" name="activa_pagina" id="activa_pagina" class="form-check-input" value="1" checked>
@@ -258,6 +296,11 @@ foreach ($rows as $row) {
                         <div class="form-group">
                             <label for="ruta_pagina_edit">Ruta del Archivo</label>
                             <input type="text" name="ruta_pagina_edit" id="ruta_pagina_edit" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="icono_pagina_edit">Icono (clase Font Awesome)</label>
+                            <input type="text" name="icono_pagina_edit" id="icono_pagina_edit" class="form-control" placeholder="ej: fas fa-user-shield">
+                            <small class="form-text text-muted">Si se deja vacío se utilizará <code>fas fa-file</code>.</small>
                         </div>
                         <div class="form-check">
                             <input type="checkbox" name="activa_pagina_edit" id="activa_pagina_edit" class="form-check-input">
@@ -343,6 +386,7 @@ foreach ($rows as $row) {
             $('#id_pagina_edit').val(pagina.id);
             $('#nombre_pagina_edit').val(pagina.nombre);
             $('#ruta_pagina_edit').val(pagina.ruta);
+            $('#icono_pagina_edit').val(pagina.icon || '');
             $('#activa_pagina_edit').prop('checked', pagina.activo == 1);
             $('#modalEditarPagina').modal('show');
         }

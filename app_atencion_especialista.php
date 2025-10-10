@@ -80,17 +80,22 @@ if (!$paginaId || !in_array((int) $paginaId, $permisos_usuario, true)) {
                                 </div>
                             </div>
                             <div class="form-row">
-                                <div class="form-group col-md-4">
+                                <div class="form-group col-md-3">
                                     <label>Plan</label>
                                     <input id="txtPlanE" class="form-control" readonly>
                                 </div>
-                                <div class="form-group col-md-4">
+                                <div class="form-group col-md-3">
                                     <label>Cobertura</label>
                                     <input id="txtCoberturaE" class="form-control" readonly>
                                 </div>
-                                <div class="form-group col-md-4">
+                                <div class="form-group col-md-3">
                                     <label>Estado Proceso</label>
                                     <input id="txtEstadoProcesoE" class="form-control" readonly>
+                                </div>
+                                <div class="form-group col-md-3 d-flex align-items-end">
+                                    <button type="button" class="btn btn-warning w-100" id="btnCerrarProceso" disabled>
+                                        <i class="fas fa-door-closed mr-1"></i>Cerrar Proceso
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -163,9 +168,6 @@ if (!$paginaId || !in_array((int) $paginaId, $permisos_usuario, true)) {
                                 </div>
                             </div>
                             <div class="d-flex justify-content-end">
-                                <button type="button" class="btn btn-warning mr-2" id="btnCerrarProceso" disabled>
-                                    <i class="fas fa-door-closed mr-1"></i>Cerrar Proceso
-                                </button>
                                 <button type="button" class="btn btn-success" id="btnGuardarConsulta" disabled>
                                     <i class="fas fa-save mr-1"></i>Guardar Consulta
                                 </button>
