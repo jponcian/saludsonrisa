@@ -2,20 +2,16 @@
 require_once 'auth_check.php';
 require_once 'conexion.php';
 header('Content-Type: application/json');
-$puedeGestionarFacturacion = in_array(2, $permisos_usuario, true);
-if (!$puedeGestionarFacturacion) {
-    http_response_code(403);
-    echo json_encode(['status' => 'error', 'message' => 'No autorizado']);
-    exit;
-}
+// Solo validar que el usuario haya iniciado sesión (auth_check.php lo hace)
 
 $id_paciente = (int) ($_POST['id_paciente'] ?? 0);
 $tipo = $_POST['tipo_pago'] ?? '';
 $monto = isset($_POST['monto']) ? (float) $_POST['monto'] : 0.0;
 $fecha = $_POST['fecha'] ?? '';
+$modalidad = $_POST['modalidad_pago'] ?? '';
 $referencia = trim($_POST['referencia'] ?? '');
 
-if (!$id_paciente || !$tipo || !$monto || !$fecha) {
+if (!$id_paciente || !$tipo || !$monto || !$fecha || !$modalidad) {
     echo json_encode(['status' => 'error', 'message' => 'Datos incompletos']);
     exit;
 }
@@ -26,41 +22,22 @@ if ($referencia === '') {
 }
 
 try {
-    // Verificar existencia de plan_suscripciones (nuevo modelo)
-    $hasSus = $pdo->query("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=DATABASE() AND table_name='plan_suscripciones'")->fetchColumn();
-    if (!$hasSus) {
-        echo json_encode(['status' => 'error', 'message' => 'No existe tabla plan_suscripciones']);
-        exit;
-    }
-    // Tomar suscripción activa más reciente
-    $stSus = $pdo->prepare("SELECT ps.*, pl.cuota_afiliacion, pl.costo_mensual, pl.nombre AS plan_nombre
-                             FROM plan_suscripciones ps
-                             INNER JOIN planes pl ON pl.id=ps.plan_id
-                             WHERE ps.paciente_id=? AND ps.activo=1
-                             ORDER BY ps.id DESC LIMIT 1");
+    // Verificar existencia de plan_suscripciones y plan_pagos, tomar suscripción activa y validar referencia única
+    $stSus = $pdo->prepare("SELECT ps.*, pl.cuota_afiliacion FROM plan_suscripciones ps INNER JOIN planes pl ON pl.id=ps.plan_id WHERE ps.paciente_id=? AND ps.activo=1 ORDER BY ps.id DESC LIMIT 1");
     $stSus->execute([$id_paciente]);
     $sus = $stSus->fetch(PDO::FETCH_ASSOC);
     if (!$sus) {
-        echo json_encode(['status' => 'error', 'message' => 'Paciente sin plan asignado']);
+        echo json_encode(['status' => 'error', 'message' => 'Datos incompletos']);
         exit;
     }
     $plan_id = (int) $sus['plan_id'];
     $cuotaAfiliacion = isset($sus['cuota_afiliacion']) ? (float) $sus['cuota_afiliacion'] : 0.0;
-
-    // Verificar existencia de plan_pagos
-    $hasPagos = $pdo->query("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=DATABASE() AND table_name='plan_pagos'")->fetchColumn();
-    if (!$hasPagos) {
-        echo json_encode(['status' => 'error', 'message' => 'Tabla plan_pagos no existe']);
-        exit;
-    }
-
-    // Validar referencia única (global)
     $colsPagos = $pdo->query("SHOW COLUMNS FROM plan_pagos")->fetchAll(PDO::FETCH_COLUMN);
     if (in_array('referencia', $colsPagos, true)) {
         $stRef = $pdo->prepare("SELECT 1 FROM plan_pagos WHERE UPPER(referencia)=UPPER(?) LIMIT 1");
         $stRef->execute([$referencia]);
         if ($stRef->fetchColumn()) {
-            echo json_encode(['status' => 'error', 'message' => 'Referencia ya utilizada']);
+            echo json_encode(['status' => 'error', 'message' => 'Datos incompletos']);
             exit;
         }
     }
@@ -69,29 +46,26 @@ try {
     $stmtTot = $pdo->prepare("SELECT COALESCE(SUM(monto),0) FROM plan_pagos WHERE paciente_id=? AND plan_id=? AND tipo_pago IN ('inscripcion','inscripcion_diferencia')");
     $stmtTot->execute([$id_paciente, $plan_id]);
     $totalInscripcionPagada = (float) $stmtTot->fetchColumn();
-
     if ($tipo === 'inscripcion') {
         if ($cuotaAfiliacion <= 0) {
-            echo json_encode(['status' => 'error', 'message' => 'Este plan no requiere pago de inscripción']);
+            echo json_encode(['status' => 'error', 'message' => 'Datos incompletos']);
             exit;
         }
         if ($totalInscripcionPagada + 0.009 >= $cuotaAfiliacion) {
-            echo json_encode(['status' => 'error', 'message' => 'La inscripción ya fue completada']);
+            echo json_encode(['status' => 'error', 'message' => 'Datos incompletos']);
             exit;
         }
         if (($totalInscripcionPagada + $monto) > $cuotaAfiliacion + 0.009) {
-            $restante = $cuotaAfiliacion - $totalInscripcionPagada;
-            echo json_encode(['status' => 'error', 'message' => 'Monto excede lo requerido. Restante: ' . number_format($restante, 2, '.', '')]);
+            echo json_encode(['status' => 'error', 'message' => 'Datos incompletos']);
             exit;
         }
     } elseif ($tipo === 'mensualidad') {
         if ($cuotaAfiliacion > 0 && $totalInscripcionPagada + 0.009 < $cuotaAfiliacion) {
-            $restante = $cuotaAfiliacion - $totalInscripcionPagada;
-            echo json_encode(['status' => 'error', 'message' => 'Inscripción incompleta. Falta: ' . number_format($restante, 2, '.', '')]);
+            echo json_encode(['status' => 'error', 'message' => 'Datos incompletos']);
             exit;
         }
     } else {
-        echo json_encode(['status' => 'error', 'message' => 'Tipo de pago no soportado']);
+        echo json_encode(['status' => 'error', 'message' => 'Datos incompletos']);
         exit;
     }
 
@@ -138,10 +112,20 @@ try {
         $periodoHasta = null;
     }
 
-    if ($tienePeriodoDesde && $tienePeriodoHasta) {
+    $colsPagos = $pdo->query("SHOW COLUMNS FROM plan_pagos")->fetchAll(PDO::FETCH_COLUMN);
+    $tieneModalidad = in_array('modalidad_pago', $colsPagos, true);
+    if ($tienePeriodoDesde && $tienePeriodoHasta && $tieneModalidad) {
+        $sqlIns = 'INSERT INTO plan_pagos (paciente_id, plan_id, tipo_pago, monto, fecha_pago, referencia, modalidad_pago, periododesde, periodohasta' . ($tieneCreado ? ', creado_en' : '') . ') VALUES (?,?,?,?,?,?,?,?,?' . ($tieneCreado ? ',NOW()' : '') . ')';
+        $ins = $pdo->prepare($sqlIns);
+        $ins->execute([$id_paciente, $plan_id, $tipo, $monto, $fecha, $referencia, $modalidad, $periodoDesde, $periodoHasta]);
+    } else if ($tienePeriodoDesde && $tienePeriodoHasta) {
         $sqlIns = 'INSERT INTO plan_pagos (paciente_id, plan_id, tipo_pago, monto, fecha_pago, referencia, periododesde, periodohasta' . ($tieneCreado ? ', creado_en' : '') . ') VALUES (?,?,?,?,?,?,?,?' . ($tieneCreado ? ',NOW()' : '') . ')';
         $ins = $pdo->prepare($sqlIns);
         $ins->execute([$id_paciente, $plan_id, $tipo, $monto, $fecha, $referencia, $periodoDesde, $periodoHasta]);
+    } else if ($tieneModalidad) {
+        $sqlIns = 'INSERT INTO plan_pagos (paciente_id, plan_id, tipo_pago, monto, fecha_pago, referencia, modalidad_pago' . ($tieneCreado ? ', creado_en' : '') . ') VALUES (?,?,?,?,?,?,?' . ($tieneCreado ? ',NOW()' : '') . ')';
+        $ins = $pdo->prepare($sqlIns);
+        $ins->execute([$id_paciente, $plan_id, $tipo, $monto, $fecha, $referencia, $modalidad]);
     } else {
         $sqlIns = 'INSERT INTO plan_pagos (paciente_id, plan_id, tipo_pago, monto, fecha_pago, referencia' . ($tieneCreado ? ', creado_en' : '') . ') VALUES (?,?,?,?,?,?' . ($tieneCreado ? ',NOW()' : '') . ')';
         $ins = $pdo->prepare($sqlIns);

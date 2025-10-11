@@ -175,22 +175,31 @@ if (!$paginaId || !in_array((int) $paginaId, $permisos_usuario, true)) {
                                 <!-- El estado de la inscripción aparecerá aquí -->
                             </div>
                             <div class="form-row">
-                                <div class="form-group col-md-3">
+                                <div class="form-group col-md-2">
                                     <label class="w-100 text-center">Tipo Pago</label>
                                     <select id="facTipoPago" class="form-control">
                                         <option value="inscripcion">Inscripción</option>
                                         <option value="mensualidad">Mensualidad</option>
                                     </select>
                                 </div>
-                                <div class="form-group col-md-3">
+                                <div class="form-group col-md-2">
+                                    <label class="w-100 text-center">Modalidad de Pago</label>
+                                    <select id="facModalidadPago" class="form-control">
+                                        <option value="Punto de Venta">Punto de Venta</option>
+                                        <option value="Pago Movil">Pago Móvil</option>
+                                        <option value="Efectivo">Efectivo</option>
+                                        <option value="Divisas">Divisas</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-md-2">
                                     <label class="w-100 text-center">Monto</label>
                                     <input id="facMontoPago" type="text" class="form-control text-right">
                                 </div>
-                                <div class="form-group col-md-3">
+                                <div class="form-group col-md-2">
                                     <label class="w-100 text-center">Fecha</label>
                                     <input id="facFechaPago" type="date" class="form-control text-right" value="<?php echo date('Y-m-d'); ?>">
                                 </div>
-                                <div class="form-group col-md-3">
+                                <div class="form-group col-md-2">
                                     <label class="w-100 text-center">Referencia</label>
                                     <input id="facRefPago" class="form-control text-right" maxlength="60">
                                 </div>
@@ -208,6 +217,7 @@ if (!$paginaId || !in_array((int) $paginaId, $permisos_usuario, true)) {
                                             <th>Hasta</th>
                                             <th>Tipo</th>
                                             <th>Monto</th>
+                                            <th>Modalidad</th>
                                             <th>Ref</th>
                                             <th>Acción</th>
                                         </tr>

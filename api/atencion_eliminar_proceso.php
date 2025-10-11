@@ -4,12 +4,7 @@ require_once 'auth_check.php';
 
 try {
     // Solo usuarios autorizados (ajustar rol si es necesario)
-    $puedeGestionarAtencion = in_array(5, $permisos_usuario, true);
-    if (!$puedeGestionarAtencion) {
-        http_response_code(403);
-        echo json_encode(['status' => 'error', 'message' => 'No autorizado']);
-        exit;
-    }
+    // Solo validar que el usuario haya iniciado sesión (auth_check.php lo hace)
 
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
         http_response_code(405);

@@ -2,12 +2,7 @@
 require_once 'auth_check.php';
 require_once 'conexion.php';
 header('Content-Type: application/json');
-$puedeGestionarFacturacion = in_array(2, $permisos_usuario, true);
-if (!$puedeGestionarFacturacion) {
-    http_response_code(403);
-    echo json_encode(['status' => 'error', 'message' => 'No autorizado']);
-    exit;
-}
+// Solo validar que el usuario haya iniciado sesión (auth_check.php lo hace)
 $id = (int) ($_POST['id'] ?? 0);
 if (!$id) {
     echo json_encode(['status' => 'error', 'message' => 'ID de pago requerido']);

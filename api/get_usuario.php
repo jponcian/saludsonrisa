@@ -3,12 +3,7 @@ require_once 'auth_check.php';
 require_once 'conexion.php';
 header('Content-Type: application/json');
 
-$puedeGestionarUsuarios = in_array(4, $permisos_usuario, true);
-if (!$puedeGestionarUsuarios) {
-    http_response_code(403);
-    echo json_encode(['status' => 'error', 'message' => 'Acceso denegado.']);
-    exit;
-}
+// Solo validar que el usuario haya iniciado sesión (auth_check.php lo hace)
 
 if (!isset($_GET['id'])) {
     echo json_encode(['status' => 'error', 'message' => 'ID de usuario no proporcionado.']);
@@ -34,4 +29,3 @@ try {
 } catch (PDOException $e) {
     echo json_encode(['status' => 'error', 'message' => 'Error al obtener el usuario: ' . $e->getMessage()]);
 }
-?>

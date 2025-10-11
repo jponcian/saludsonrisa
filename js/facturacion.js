@@ -402,7 +402,9 @@
                 : "";
             return `<tr><td>${fecha}</td><td>${desde}</td><td>${hasta}</td><td>${tipoLabel}</td><td>${formatNumber(
               p.monto
-            )}</td><td>${p.referencia || ""}</td><td>${btnEliminar}</td></tr>`;
+            )}</td><td>${p.modalidad_pago || ""}</td><td>${
+              p.referencia || ""
+            }</td><td>${btnEliminar}</td></tr>`;
           });
           tablaPagos.html(
             rows.join("") ||
@@ -605,6 +607,7 @@
   function registrarPago() {
     const idPaciente = selPaciente.val();
     const tipo = tipoPago.val();
+    const modalidad = $("#facModalidadPago").val();
     const monto = montoPago.inputmask("unmaskedvalue");
     const fecha = fechaPago.val();
 
@@ -620,6 +623,10 @@
       pagoErr("Referencia requerida");
       return;
     }
+    if (!modalidad) {
+      pagoErr("Seleccione modalidad de pago");
+      return;
+    }
     btnRegistrarPago.prop("disabled", true);
     showLoadingPago("Registrando pago...");
     api(
@@ -627,6 +634,7 @@
       {
         id_paciente: idPaciente,
         tipo_pago: tipo,
+        modalidad_pago: modalidad,
         monto: monto,
         fecha: fecha,
         referencia: refPago.val(),

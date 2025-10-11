@@ -7,7 +7,7 @@ if (isset($_GET['id'])) {
     $raw = base64_decode($_GET['id']);
     $parts = explode('|', $raw);
     if (count($parts) === 2 && $parts[1] === 'saludsonrisa2025') {
-        $id = (int)$parts[0];
+        $id = (int) $parts[0];
     }
 }
 if (!$id) {
@@ -43,8 +43,15 @@ if (empty($suscripcion['numero']) || $suscripcion['numero'] == 0) {
 function formato_cedula($cedula)
 {
     $cedula = preg_replace('/\D/', '', $cedula);
-    if (strlen($cedula) >= 8) {
+    if (strlen($cedula) == 8) {
+        // 8 dígitos: 00.000.000
         return substr($cedula, 0, 2) . '.' . substr($cedula, 2, 3) . '.' . substr($cedula, 5);
+    } elseif (strlen($cedula) == 7) {
+        // 7 dígitos: 0.000.000
+        return substr($cedula, 0, 1) . '.' . substr($cedula, 1, 3) . '.' . substr($cedula, 4);
+    } elseif (strlen($cedula) == 6) {
+        // 6 dígitos: 000.000
+        return substr($cedula, 0, 3) . '.' . substr($cedula, 3);
     }
     return $cedula;
 }
@@ -74,25 +81,34 @@ if (file_exists($img_frontal)) {
     imagefilledrectangle($img, 0, 0, $width, $height, $bg);
 }
 // Colores y fuentes
+// Colores y fuentes actualizados para texto blanco y negrita
 $colorTitulo = imagecolorallocate($img, 0, 123, 255);
-$colorTexto = imagecolorallocate($img, 40, 40, 40);
+$colorTexto = imagecolorallocate($img, 255, 255, 255); // Blanco
 $colorInfo = imagecolorallocate($img, 120, 120, 120);
-$font = __DIR__ . '/../plugins/fonts/static/OpenSans-Regular.ttf'; // Fuente TTF legible
+$font = __DIR__ . '/../plugins/fonts/static/OpenSans-Bold.ttf'; // Fuente TTF en negrita
 // Número de afiliado
-imagettftext($img, 32, 0, 100, 355, $colorTexto, $font, $numero_afiliado);
+imagettftext($img, 32, 0, 100, 357, $colorTexto, $font, $numero_afiliado);
 // Nombre
-imagettftext($img, 32, 0, 50, 480, $colorTexto, $font,  $nombre);
+imagettftext($img, 32, 0, 50, 480, $colorTexto, $font, $nombre);
 // Cédula y teléfono
-imagettftext($img, 32, 0, 50, 520, $colorTexto, $font,  $cedula_fmt . '    ' . $telefono_fmt);
+imagettftext($img, 32, 0, 50, 540, $colorTexto, $font, $cedula_fmt . '    ' . $telefono_fmt);
 // Info legal
 imagettftext($img, 24, 0, 50, 600, $colorInfo, $font, 'Válido solo para afiliados activos');
 // Generar QR
-$qr_url = 'https://clinicasaludsonrisa.zz.com.ve/qr_info.php?afiliado=' . $numero_afiliado;
+// --- Parámetros QR editables ---
+$qr_size = 190; // Tamaño del QR (ajusta aquí)
+$qr_offset_x = 50; // Más a la izquierda: aumenta este valor
+$qr_offset_y = 49; // Más arriba: aumenta este valor
+// --- Fin parámetros QR ---
+$raw_id = $id . '|saludsonrisa2025';
+$id_codificado = base64_encode($raw_id);
+$qr_url = 'https://clinicasaludsonrisa.zz.com.ve/qr_info.php?id=' . urlencode($id_codificado);
 $qr_temp = tempnam(sys_get_temp_dir(), 'qr_');
-QRcode::png($qr_url, $qr_temp, QR_ECLEVEL_L, 6);
+QRcode::png($qr_url, $qr_temp, QR_ECLEVEL_L, 4, 0); // cuadros internos más grandes
 $qr_img = imagecreatefrompng($qr_temp);
-$qr_size = 180;
-imagecopyresampled($img, $qr_img, $width - $qr_size - 40, $height - $qr_size - 40, 0, 0, $qr_size, $qr_size, imagesx($qr_img), imagesy($qr_img));
+$qr_x = $width - $qr_size - $qr_offset_x;
+$qr_y = $height - $qr_size - $qr_offset_y;
+imagecopyresampled($img, $qr_img, $qr_x, $qr_y, 0, 0, $qr_size, $qr_size, imagesx($qr_img), imagesy($qr_img));
 imagedestroy($qr_img);
 unlink($qr_temp);
 // Salida PNG

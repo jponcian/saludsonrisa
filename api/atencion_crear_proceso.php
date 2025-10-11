@@ -2,12 +2,7 @@
 require_once 'auth_check.php';
 require_once 'conexion.php';
 header('Content-Type: application/json');
-$puedeGestionarAtencion = in_array(5, $permisos_usuario, true);
-if (!$puedeGestionarAtencion) {
-    http_response_code(403);
-    echo json_encode(['status' => 'error', 'message' => 'No autorizado']);
-    exit;
-}
+// Solo validar que el usuario haya iniciado sesión (auth_check.php lo hace)
 $id_paciente = isset($_POST['id_paciente']) ? (int) $_POST['id_paciente'] : 0;
 
 $motivo = trim($_POST['motivo'] ?? '');

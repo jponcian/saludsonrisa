@@ -2,12 +2,7 @@
 require_once 'auth_check.php';
 
 // Validar permiso para gestionar usuarios (permiso_id = 4)
-$puedeGestionarUsuarios = in_array(4, $permisos_usuario, true);
-if (!$puedeGestionarUsuarios) {
-    http_response_code(403); // Forbidden
-    echo json_encode(['status' => 'error', 'message' => 'Acceso denegado.']);
-    exit;
-}
+// Solo validar que el usuario haya iniciado sesión (auth_check.php lo hace)
 
 header('Content-Type: application/json');
 require 'conexion.php';

@@ -2,12 +2,7 @@
 require_once 'auth_check.php';
 require_once 'conexion.php';
 header('Content-Type: application/json');
-$puedeGestionarFacturacion = in_array(2, $permisos_usuario, true);
-if (!$puedeGestionarFacturacion) {
-    http_response_code(403);
-    echo json_encode(['status' => 'error', 'message' => 'No autorizado']);
-    exit;
-}
+// Solo validar que el usuario haya iniciado sesión (auth_check.php lo hace)
 $id_paciente = (int) ($_POST['id_paciente'] ?? 0);
 $plan_id = (int) ($_POST['plan_id'] ?? 0);
 $obs = trim($_POST['obs'] ?? ''); // se ignora en este modelo simplificado

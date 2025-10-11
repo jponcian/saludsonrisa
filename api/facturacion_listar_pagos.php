@@ -21,11 +21,14 @@ try {
     if (in_array('paciente_id', $chkCols)) {
         $tienePeriodoDesde = in_array('periododesde', $chkCols, true);
         $tienePeriodoHasta = in_array('periodohasta', $chkCols, true);
+        $tieneModalidad = in_array('modalidad_pago', $chkCols, true);
         $extra = '';
         if ($tienePeriodoDesde)
             $extra .= ', periododesde';
         if ($tienePeriodoHasta)
             $extra .= ', periodohasta';
+        if ($tieneModalidad)
+            $extra .= ', modalidad_pago';
         // Ordenar descendente por periodohasta si existe, sino por fecha_pago
         if ($tienePeriodoHasta) {
             $stmt = $pdo->prepare('SELECT id, fecha_pago AS fecha, tipo_pago AS tipo, monto, referencia, plan_id' . $extra . ' FROM plan_pagos WHERE paciente_id=? ORDER BY periodohasta DESC, id DESC');

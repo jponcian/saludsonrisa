@@ -221,7 +221,8 @@ if ($rol === 'especialista') {
                   <br>
                   <button type="button" class="btn btn-success btn-sm mt-2" id="btn-capturar-foto">Capturar</button>
                   <canvas id="canvas-camara" width="220" height="180" style="display:none;"></canvas>
-                  <img id="img-capturada" src="" alt="Foto capturada" style="display:none; margin-top:10px; max-width:220px; border-radius:8px;">
+                  <img id="img-capturada" src="" alt="Foto capturada"
+                    style="display:none; margin-top:10px; max-width:220px; border-radius:8px;">
                   <button type="button" class="btn btn-danger btn-sm mt-2" id="btn-cerrar-camara">Cerrar cámara</button>
                 </div>
               </div>
@@ -295,7 +296,8 @@ if ($rol === 'especialista') {
               aria-label="Close"><span aria-hidden="true">&times;</span></button>
           </div>
           <div class="modal-body" id="historial-paciente-body"></div>
-          <div class="modal-footer"> <button type="button" class="btn btn-success" id="btn-generar-carnet" style="display:none;">
+          <div class="modal-footer"> <button type="button" class="btn btn-success" id="btn-generar-carnet"
+              style="display:none;">
               <i class="fas fa-id-card"></i> Generar Carnet
             </button>
             <button type="button" class="btn btn-info" data-dismiss="modal">Cerrar</button>
@@ -331,26 +333,26 @@ if ($rol === 'especialista') {
       var usuarioNombre = '<?php echo addslashes($nombre_completo); ?>';
       var especialistaId = <?php echo ($especialista_id !== null) ? intval($especialista_id) : 'null'; ?>;
 
-      $(function() {
+      $(function () {
         // --- Cámara nativa para foto paciente ---
         let stream = null;
-        $('#btn-usar-camara').on('click', function() {
+        $('#btn-usar-camara').on('click', function () {
           $('#preview-camara').show();
           $('#img-capturada').hide();
           $('#canvas-camara').hide();
           navigator.mediaDevices.getUserMedia({
-              video: true
-            })
-            .then(function(s) {
+            video: true
+          })
+            .then(function (s) {
               stream = s;
               $('#video-camara')[0].srcObject = stream;
               $('#video-camara').show();
             })
-            .catch(function(err) {
+            .catch(function (err) {
               alert('No se pudo acceder a la cámara: ' + err);
             });
         });
-        $('#btn-capturar-foto').on('click', function() {
+        $('#btn-capturar-foto').on('click', function () {
           // Oculta los botones de capturar y cerrar cámara
           $('#btn-capturar-foto').hide();
           $('#btn-cerrar-camara').hide();
@@ -377,7 +379,7 @@ if ($rol === 'especialista') {
             $('#foto_capturada').val(dataUrl);
           }
         });
-        $('#btn-cerrar-camara').on('click', function() {
+        $('#btn-cerrar-camara').on('click', function () {
           $('#preview-camara').hide();
           if (stream) {
             stream.getTracks().forEach(track => track.stop());
@@ -387,25 +389,25 @@ if ($rol === 'especialista') {
         bsCustomFileInput.init();
         // --- Cámara nativa para foto paciente (modal editar) ---
         let streamEditar = null;
-        $(document).on('click', '#btn-usar-camara-editar', function() {
+        $(document).on('click', '#btn-usar-camara-editar', function () {
           $('#preview-camara-editar').show();
           $('#img-capturada-editar').hide();
           $('#canvas-camara-editar').hide();
           $('#btn-capturar-foto-editar').show();
           $('#btn-cerrar-camara-editar').show();
           navigator.mediaDevices.getUserMedia({
-              video: true
-            })
-            .then(function(s) {
+            video: true
+          })
+            .then(function (s) {
               streamEditar = s;
               $('#video-camara-editar')[0].srcObject = streamEditar;
               $('#video-camara-editar').show();
             })
-            .catch(function(err) {
+            .catch(function (err) {
               alert('No se pudo acceder a la cámara: ' + err);
             });
         });
-        $(document).on('click', '#btn-capturar-foto-editar', function() {
+        $(document).on('click', '#btn-capturar-foto-editar', function () {
           $('#btn-capturar-foto-editar').hide();
           $('#btn-cerrar-camara-editar').hide();
           var video = $('#video-camara-editar')[0];
@@ -430,7 +432,7 @@ if ($rol === 'especialista') {
             $('#foto_capturada_editar').val(dataUrl);
           }
         });
-        $(document).on('click', '#btn-cerrar-camara-editar', function() {
+        $(document).on('click', '#btn-cerrar-camara-editar', function () {
           $('#preview-camara-editar').hide();
           if (streamEditar) {
             streamEditar.getTracks().forEach(track => track.stop());
@@ -444,7 +446,7 @@ if ($rol === 'especialista') {
         });
 
         // Cuando se abre el modal de consulta
-        $('#modal-crear-consulta').on('show.bs.modal', function() {
+        $('#modal-crear-consulta').on('show.bs.modal', function () {
           var $selectEspecialista = $(this).find('select[name="especialista_id"]');
           var $selectEspecialidad = $(this).find('#select-especialidad');
           $selectEspecialista.empty();
@@ -456,12 +458,12 @@ if ($rol === 'especialista') {
             // Añadir un campo hidden para enviar el especialista_id
             $('#form-crear-consulta').append('<input type="hidden" name="especialista_id" value="' + especialistaId + '">');
             // Cargar especialidades del especialista automáticamente
-            $.get('api/especialistas.php?id=' + especialistaId, function(response) {
+            $.get('api/especialistas.php?id=' + especialistaId, function (response) {
               if (response && response.status === 'success' && response.data) {
                 var especialista = response.data;
                 if (especialista.especialidades && Array.isArray(especialista.especialidades)) {
                   $selectEspecialidad.empty();
-                  especialista.especialidades.forEach(function(es) {
+                  especialista.especialidades.forEach(function (es) {
                     var newOption = new Option(es.nombre, es.id, false, false);
                     $selectEspecialidad.append(newOption);
                   });
@@ -472,9 +474,9 @@ if ($rol === 'especialista') {
           } else {
             // Si no, cargar todos los especialistas y habilitar
             $selectEspecialista.prop('disabled', false);
-            $.get('api/especialistas.php', function(data) {
+            $.get('api/especialistas.php', function (data) {
               if (data && data.data) {
-                data.data.forEach(function(e) {
+                data.data.forEach(function (e) {
                   $selectEspecialista.append('<option value="' + e.id + '">' + e.nombre_completo + '</option>');
                 });
                 $selectEspecialista.trigger('change'); // Disparar el evento change para cargar especialidades
@@ -494,94 +496,85 @@ if ($rol === 'especialista') {
             dataSrc: "data"
           },
           columns: [{
-              "data": "id",
-              render: function(data, type, row, meta) {
-                return meta.settings._iDisplayStart + meta.row + 1;
-              }
-            },
-            {
-              "data": "cedula"
-            },
-            {
-              "data": "foto_url",
-              "className": "text-center", // Añadido para centrar el contenido
-              render: function(data) {
-                return '<img src="' + (data ? 'uploads/' + data : 'logo.png') + '?' + new Date().getTime() + '" class="img-circle elevation-2" width="40">';
-              }
-            },
-            {
-              "data": "nombres"
-            },
-            {
-              "data": "apellidos"
-            },
-            {
-              "data": "fecha_nacimiento",
-              render: function(data) {
-                if (!data) return '';
-                // Si ya viene en formato dd-mm-yyyy
-                if (/\\d{2}-\\d{2}-\\d{4}/.test(data)) return data;
-                // Si viene yyyy-mm-dd
-                if (/\\d{4}-\\d{2}-\\d{2}/.test(data)) {
-                  let [y, m, d] = data.split('-');
-                  return d + '-' + m + '-' + y;
-                }
-                // Si es fecha JS
-                var d = new Date(data);
-                if (!isNaN(d)) {
-                  let day = ('0' + d.getDate()).slice(-2);
-                  let month = ('0' + (d.getMonth() + 1)).slice(-2);
-                  let year = d.getFullYear();
-                  return day + '-' + month + '-' + year;
-                }
-                return data;
-              }
-            },
-            {
-              "data": "genero"
-            },
-
-            {
-              "data": null,
-              render: function(data, type, row) {
-                var patientData = JSON.stringify(row);
-                var historiaBtnClass = (row.historia_estado === 'completado') ? 'btn btn-success btn-sm btn-historia-clinica' : 'btn btn-secondary btn-sm btn-historia-clinica';
-                var html = "<button class='btn btn-info btn-sm btn-ver-paciente' data-id='" + row.id + "' data-toggle='tooltip' data-placement='top' title='Ver paciente'><i class='fas fa-eye'></i></button> " +
-                  "<a class='" + historiaBtnClass + "' href='app_historia_clinica.php?id=" + row.id + "' data-toggle='tooltip' data-placement='top' title='Historia clínica'><i class='fas fa-notes-medical'></i></a> " +
-                  "<button class='btn btn-warning btn-sm btn-editar-paciente' data-paciente='" + patientData + "' data-toggle='tooltip' data-placement='top' title='Editar paciente'><i class='fas fa-edit'></i></button>";
-                if (row.afiliacion_pagada) {
-                  html += " <button class='btn btn-success btn-sm btn-ver-carnet' data-id='" + row.id + "' data-toggle='tooltip' data-placement='top' title='Ver carnet'><i class='fas fa-id-card'></i></button>";
-                }
-                if (usuarioRol !== 'Estandar') {
-                  html += " <button class='btn btn-danger btn-sm btn-eliminar-paciente' data-id='" + row.id + "' data-toggle='tooltip' data-placement='top' title='Eliminar paciente'><i class='fas fa-trash'></i></button>";
-                }
-                return html;
-              }
+            "data": "id",
+            render: function (data, type, row, meta) {
+              return meta.settings._iDisplayStart + meta.row + 1;
             }
+          },
+          {
+            "data": "cedula"
+          },
+          {
+            "data": "foto_url",
+            "className": "text-center", // Añadido para centrar el contenido
+            render: function (data) {
+              return '<img src="' + (data ? 'uploads/' + data : 'logo.png') + '?' + new Date().getTime() + '" class="img-circle elevation-2" width="40">';
+            }
+          },
+          {
+            "data": "nombres"
+          },
+          {
+            "data": "apellidos"
+          },
+          {
+            "data": "fecha_nacimiento",
+            render: function (data) {
+              if (!data) return '';
+              // Si ya viene en formato dd-mm-yyyy
+              if (/\\d{2}-\\d{2}-\\d{4}/.test(data)) return data;
+              // Si viene yyyy-mm-dd
+              if (/\\d{4}-\\d{2}-\\d{2}/.test(data)) {
+                let [y, m, d] = data.split('-');
+                return d + '-' + m + '-' + y;
+              }
+              // Si es fecha JS
+              var d = new Date(data);
+              if (!isNaN(d)) {
+                let day = ('0' + d.getDate()).slice(-2);
+                let month = ('0' + (d.getMonth() + 1)).slice(-2);
+                let year = d.getFullYear();
+                return day + '-' + month + '-' + year;
+              }
+              return data;
+            }
+          },
+          {
+            "data": "genero"
+          },
+
+          {
+            "data": null,
+            render: function (data, type, row) {
+              var patientData = JSON.stringify(row);
+              var historiaBtnClass = (row.historia_estado === 'completado') ? 'btn btn-success btn-sm btn-historia-clinica' : 'btn btn-secondary btn-sm btn-historia-clinica';
+              var html = "<button class='btn btn-info btn-sm btn-ver-paciente' data-id='" + row.id + "' data-toggle='tooltip' data-placement='top' title='Ver paciente'><i class='fas fa-eye'></i></button> " +
+                "<a class='" + historiaBtnClass + "' href='app_historia_clinica.php?id=" + row.id + "' data-toggle='tooltip' data-placement='top' title='Historia clínica'><i class='fas fa-notes-medical'></i></a> " +
+                "<button class='btn btn-warning btn-sm btn-editar-paciente' data-paciente='" + patientData + "' data-toggle='tooltip' data-placement='top' title='Editar paciente'><i class='fas fa-edit'></i></button>";
+              if (row.afiliacion_pagada) {
+                html += " <button class='btn btn-success btn-sm btn-ver-carnet' data-id='" + row.id + "' data-toggle='tooltip' data-placement='top' title='Ver carnet'><i class='fas fa-id-card'></i></button>";
+              }
+              if (usuarioRol !== 'Estandar') {
+                html += " <button class='btn btn-danger btn-sm btn-eliminar-paciente' data-id='" + row.id + "' data-toggle='tooltip' data-placement='top' title='Eliminar paciente'><i class='fas fa-trash'></i></button>";
+              }
+              return html;
+            }
+          }
           ],
           language: {
             url: "plugins/datatables/i18n/Spanish.json"
           }
         });
 
-        // Abrir carnet en nueva pestaña desde el listado
-        $('#tabla-pacientes tbody').on('click', '.btn-ver-carnet', function() {
-          var pacienteId = $(this).data('id');
-          if (pacienteId) {
-            var encryptedId = btoa(pacienteId + '|saludsonrisa2025');
-            window.open('formatos/carnet.php?id=' + encodeURIComponent(encryptedId), '_blank');
-          }
-        });
-
         // Inicializar tooltips después de dibujar la tabla
-        tablaPacientes.on('draw', function() {
+        tablaPacientes.on('draw', function () {
           $('[data-toggle="tooltip"]').tooltip();
         });
         // Inicializar tooltips para el primer draw
         $('[data-toggle="tooltip"]').tooltip();
 
         // Envío AJAX del formulario Registrar Paciente (evita GET con parámetros enormes en la URL)
-        $('#form-registrar-paciente').on('submit', function(e) {
+        $('#form-registrar-paciente').on('submit', function (e) {
           e.preventDefault();
           var form = this;
           var formData = new FormData(form);
@@ -595,13 +588,13 @@ if ($rol === 'especialista') {
             contentType: false,
             processData: false,
             dataType: 'json',
-            success: function(response) {
+            success: function (response) {
               if (response && response.status === 'success') {
                 // Cerrar cámara si quedara abierta
                 if (typeof stream !== 'undefined' && stream) {
                   try {
                     stream.getTracks().forEach(t => t.stop());
-                  } catch (err) {}
+                  } catch (err) { }
                   stream = null;
                 }
                 $('#modal-registrar-paciente').modal('hide');
@@ -625,7 +618,7 @@ if ($rol === 'especialista') {
                       cancelButton: 'btn btn-secondary'
                     },
                     buttonsStyling: false
-                  }).then(function(result) {
+                  }).then(function (result) {
                     if (nuevoPacienteId && result.isConfirmed) {
                       window.location.href = 'app_historia_clinica.php?id=' + nuevoPacienteId;
                     }
@@ -650,7 +643,7 @@ if ($rol === 'especialista') {
                 }
               }
             },
-            error: function(xhr, status, error) {
+            error: function (xhr, status, error) {
               let msg = 'Error de conexión al registrar el paciente.';
               if (xhr && xhr.responseText) msg += ' Respuesta: ' + xhr.responseText;
               $('#error-message-paciente').text(msg).show();
@@ -739,7 +732,7 @@ if ($rol === 'especialista') {
     `);
 
         // Editar paciente
-        $('#tabla-pacientes tbody').on('click', '.btn-editar-paciente', function() {
+        $('#tabla-pacientes tbody').on('click', '.btn-editar-paciente', function () {
           // Limpiar foto capturada y vista previa de cámara
           $('#foto_capturada_editar').remove();
           $('#img-capturada-editar').attr('src', '').hide();
@@ -781,17 +774,16 @@ if ($rol === 'especialista') {
           $('#modal-editar-paciente').modal('show');
         });
         // ...existing code...
-        // Abrir carnet en nueva pestaña con QR al hacer clic en el botón
-        $('#btn-generar-carnet').on('click', function() {
+        // Abrir ambas caras del carnet en nueva pestaña al hacer clic en el botón
+        $('#btn-generar-carnet').on('click', function () {
           var pacienteId = $('#modal-ver-paciente').data('paciente-id');
           if (pacienteId) {
             var encryptedId = btoa(pacienteId + '|saludsonrisa2025');
-            window.open('formatos/carnet.php?id=' + encodeURIComponent(encryptedId), '_blank');
+            window.open('formatos/ver_carnet.php?id=' + encodeURIComponent(encryptedId), '_blank');
           }
-          // Función para desencriptar el id en PHP: base64_decode y luego explode('|', $str)[0]
         });
 
-        $('#tabla-pacientes tbody').on('click', '.btn-crear-consulta', function() {
+        $('#tabla-pacientes tbody').on('click', '.btn-crear-consulta', function () {
           var data = $(this).data('paciente');
           $('#form-crear-consulta')[0].reset();
           $('#error-message-consulta').hide();
@@ -800,7 +792,7 @@ if ($rol === 'especialista') {
           $.ajax({
             url: 'api/get_datos_consulta.php',
             dataType: 'json',
-            success: function(response) {
+            success: function (response) {
               if (response.status === 'success') {
                 var espSelect = $('select[name="especialista_id"]');
                 espSelect.empty().append('<option selected disabled value="">Seleccione...</option>');
@@ -809,7 +801,7 @@ if ($rol === 'especialista') {
                 var especialidadesData = response.data.especialidades;
                 espSelect.data('especialistas', especialistasData);
                 espSelect.data('especialidades', especialidadesData);
-                especialistasData.forEach(function(esp) {
+                especialistasData.forEach(function (esp) {
                   espSelect.append($('<option>', {
                     value: esp.id,
                     text: esp.nombre_completo,
@@ -820,14 +812,14 @@ if ($rol === 'especialista') {
                 especSelect.empty();
                 especSelect.append('<option disabled value="">Seleccione un especialista</option>');
                 // Al cambiar el especialista, mostrar solo sus especialidades (multi-select)
-                espSelect.off('change').on('change', function() {
+                espSelect.off('change').on('change', function () {
                   var selectedId = $(this).val();
-                  var especialista = especialistasData.find(function(e) {
+                  var especialista = especialistasData.find(function (e) {
                     return e.id == selectedId;
                   });
                   especSelect.empty();
                   if (especialista && especialista.especialidades_ids && especialista.especialidades_ids.length > 0) {
-                    especialidadesData.forEach(function(espec) {
+                    especialidadesData.forEach(function (espec) {
                       if (especialista.especialidades_ids.includes(parseInt(espec.id))) {
                         especSelect.append($('<option>', {
                           value: espec.id,
@@ -848,7 +840,7 @@ if ($rol === 'especialista') {
           });
         });
 
-        $('#form-crear-consulta').on('submit', function(e) {
+        $('#form-crear-consulta').on('submit', function (e) {
           e.preventDefault();
           var formData = new FormData(this);
           $('#error-message-consulta').hide();
@@ -859,7 +851,7 @@ if ($rol === 'especialista') {
             contentType: false,
             processData: false,
             dataType: 'json',
-            success: function(response) {
+            success: function (response) {
               if (response.status === 'success') {
                 $('#modal-crear-consulta').modal('hide');
                 Swal.fire({
@@ -881,13 +873,13 @@ if ($rol === 'especialista') {
                 $('#error-message-consulta').text(response.message).show();
               }
             },
-            error: function() {
+            error: function () {
               $('#error-message-consulta').text('Error de conexión.').show();
             }
           });
         });
 
-        $('#tabla-pacientes tbody').on('click', '.btn-ver-paciente', function() {
+        $('#tabla-pacientes tbody').on('click', '.btn-ver-paciente', function () {
           var pacienteId = $(this).data('id');
           // Guardar el id del paciente en el modal para referencia posterior
           $('#modal-ver-paciente').data('paciente-id', pacienteId);
@@ -904,13 +896,13 @@ if ($rol === 'especialista') {
         var modalBody = $('#historial-paciente-body');
         modalBody.html('<div class="text-center"><i class="fas fa-2x fa-sync-alt fa-spin"></i><p>Cargando...</p></div>');
         // Verificar si el paciente tiene pago de afiliación suficiente
-        $.get('api/facturacion_listar_pagos.php?id_paciente=' + pacienteId, function(respPagos) {
+        $.get('api/facturacion_listar_pagos.php?id_paciente=' + pacienteId, function (respPagos) {
           var puedeGenerarCarnet = false;
           if (respPagos.status === 'ok' && Array.isArray(respPagos.data)) {
-            var pagosAfiliacion = respPagos.data.filter(function(p) {
+            var pagosAfiliacion = respPagos.data.filter(function (p) {
               return p.tipo === 'inscripcion' || p.tipo === 'inscripcion_diferencia';
             });
-            var montoTotal = pagosAfiliacion.reduce(function(sum, p) {
+            var montoTotal = pagosAfiliacion.reduce(function (sum, p) {
               return sum + parseFloat(p.monto);
             }, 0);
             // Aquí puedes definir el monto mínimo requerido
@@ -921,7 +913,7 @@ if ($rol === 'especialista') {
         $.ajax({
           url: 'api/get_paciente_historial.php?id=' + encodeURIComponent(pacienteId),
           dataType: 'json',
-          success: function(response) {
+          success: function (response) {
             if (response.status === 'success') {
               var data = response.data;
               var paciente = data.paciente;
@@ -936,14 +928,14 @@ if ($rol === 'especialista') {
               content += '<h5>Historial de Consultas</h5>';
               if (consultas.length > 0) {
                 content += '<div class="accordion" id="accordionConsultas">';
-                consultas.forEach(function(c, index) {
+                consultas.forEach(function (c, index) {
                   // Cabecera con botón PDF
                   content += `<div class="card"><div class="card-header d-flex justify-content-between align-items-center" id="heading${c.id}"><div class="flex-fill"><h2 class="mb-0"><button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#collapse${c.id}">${new Date(c.fecha_consulta).toLocaleString()} - ${c.especialidades_nombres || 'Sin especialidad'} - Dr. ${c.especialista_nombre_completo}</button></h2></div><div class="ml-2"><a class="btn btn-secondary btn-sm" href="formatos/recipe.php?id=${c.id}" target="_blank"><i class="fas fa-file-pdf"></i> PDF</a></div></div><div id="collapse${c.id}" class="collapse" data-parent="#accordionConsultas"><div class="card-body">`;
                   content += `<!-- <p><strong>Especialidades:</strong> ${c.especialidades_nombres || 'Sin especialidad'}</p> -->`;
                   content += `<p><strong>Diagnóstico:</strong> ${c.diagnostico}</p><p><strong>Tratamiento:</strong> ${c.tratamiento}</p><p><strong>Observaciones:</strong> ${c.observaciones || 'Ninguna'}</p>`;
                   if (c.fotos && c.fotos.length > 0) {
                     content += '<p><strong>Fotos:</strong></p><div class="row">';
-                    c.fotos.forEach(function(foto) {
+                    c.fotos.forEach(function (foto) {
                       content += `<div class="col-sm-2"><a href="uploads/${foto}" data-toggle="lightbox" data-gallery="gallery-${c.id}"><img src="uploads/${foto}" class="img-fluid mb-2"/></a></div>`;
                     });
                     content += '</div>';
@@ -962,14 +954,14 @@ if ($rol === 'especialista') {
               modalBody.html(`<p class="text-danger">${response.message}</p>`);
             }
           },
-          error: function() {
+          error: function () {
             modalBody.html('<p class="text-danger">Error al cargar el historial.</p>');
           }
         });
       }
 
       // Manejar el envío del formulario de edición de paciente
-      $(document).on('submit', '#form-editar-paciente', function(e) {
+      $(document).on('submit', '#form-editar-paciente', function (e) {
         e.preventDefault();
         var formData = new FormData(this);
         // Si existe foto capturada desde la cámara, elimina el campo de archivo para evitar conflicto
@@ -984,7 +976,7 @@ if ($rol === 'especialista') {
           contentType: false,
           processData: false,
           dataType: 'json',
-          success: function(response) {
+          success: function (response) {
             try {
               if (typeof response !== 'object' || response === null) {
                 throw new Error('Respuesta inválida del servidor.');
@@ -1032,7 +1024,7 @@ if ($rol === 'especialista') {
               console.error('Error procesando la respuesta:', response, err);
             }
           },
-          error: function(xhr, status, error) {
+          error: function (xhr, status, error) {
             let msg = 'Error de conexión con el servidor al intentar actualizar el paciente.';
             if (xhr && xhr.responseText) {
               msg += ' Respuesta: ' + xhr.responseText;
@@ -1052,10 +1044,10 @@ if ($rol === 'especialista') {
         });
       });
       // Eliminar paciente
-      $('#tabla-pacientes tbody').on('click', '.btn-eliminar-paciente', function() {
+      $('#tabla-pacientes tbody').on('click', '.btn-eliminar-paciente', function () {
         var id = $(this).data('id');
         // Verificar si el paciente tiene un plan asignado
-        $.get('api/facturacion_suscripcion_actual.php?id_paciente=' + id, function(response) {
+        $.get('api/facturacion_suscripcion_actual.php?id_paciente=' + id, function (response) {
           if (response.status === 'ok' && response.data) {
             Swal.fire('No se puede eliminar', 'El paciente tiene un plan de medicina prepagada asignado.', 'error');
           } else {
@@ -1076,7 +1068,7 @@ if ($rol === 'especialista') {
                     id: id
                   },
                   dataType: 'json',
-                  success: function(response) {
+                  success: function (response) {
                     if (response.status === 'success') {
                       Swal.fire('Eliminado', response.message, 'success');
                       tablaPacientes.ajax.reload();
@@ -1084,20 +1076,20 @@ if ($rol === 'especialista') {
                       Swal.fire('Error', response.message, 'error');
                     }
                   },
-                  error: function() {
+                  error: function () {
                     Swal.fire('Error', 'No se pudo eliminar el paciente.', 'error');
                   }
                 });
               }
             });
           }
-        }, 'json').fail(function() {
+        }, 'json').fail(function () {
           Swal.fire('Error', 'No se pudo verificar el plan del paciente.', 'error');
         });
       });
 
       // Eliminar consulta desde historial
-      $(document).on('click', '.btn-eliminar-consulta', function() {
+      $(document).on('click', '.btn-eliminar-consulta', function () {
         var id = $(this).data('id');
         // Obtener el id del paciente mostrado actualmente en el modal
         var pacienteId = $('#modal-ver-paciente').data('paciente-id');
@@ -1118,7 +1110,7 @@ if ($rol === 'especialista') {
                 id: id
               },
               dataType: 'json',
-              success: function(response) {
+              success: function (response) {
                 if (response.status === 'success') {
                   Swal.fire('Eliminado', response.message, 'success');
                   // Recargar historial del paciente correcto
@@ -1129,7 +1121,7 @@ if ($rol === 'especialista') {
                   Swal.fire('Error', response.message, 'error');
                 }
               },
-              error: function() {
+              error: function () {
                 Swal.fire('Error', 'No se pudo eliminar la consulta.', 'error');
               }
             });
