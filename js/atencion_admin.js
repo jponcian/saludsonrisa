@@ -1,7 +1,7 @@
 // Gestión de Validación / Apertura de Atención 24/7 (Administración)
 (function () {
   const selPaciente = $("#selPaciente");
-  const txtPlan = $("#txtPlan");
+  // const txtPlan = $("#txtPlan"); // Eliminado, solo se usa el badge
   const txtEstadoPlan = $("#estadoPlanBadge");
   const txtInscripcion = $("#txtInscripcion");
   const txtInicioCobertura = $("#txtInicioCobertura");
@@ -84,33 +84,64 @@
       limpiarPaciente();
       return;
     }
-    txtPlan.val(p.plan_nombre || "");
+    // txtPlan eliminado, solo badge
+    // Badge llamativo con icono y color
+    const planNombreRaw = (p.plan_nombre || "").toLowerCase();
+    let badgeHtml = "";
+    let badgeClass = "badge-secondary";
+    let icon = "fa-puzzle-piece";
+    let planColor = "";
+    if (planNombreRaw.includes("premium")) {
+      badgeClass = "badge-warning";
+      icon = "fa-crown";
+      planColor = "#FFD700";
+    } else if (planNombreRaw.includes("plus")) {
+      badgeClass = "badge-info";
+      icon = "fa-star";
+      planColor = "#C0C0C0";
+    } else if (planNombreRaw.includes("salud")) {
+      badgeClass = "badge-success";
+      icon = "fa-heartbeat";
+      planColor = "#CD7F32";
+    }
+    if (p.plan_nombre) {
+      badgeHtml = `<span class=\"badge ${badgeClass}\" style=\"font-size:1.1em;padding:0.6em 1.2em;border-radius:1.5em;box-shadow:0 2px 8px rgba(0,0,0,0.10);background:${planColor};color:#fff;font-weight:600;display:inline-flex;align-items:center;gap:0.5em;\"><i class=\"fas ${icon}\" style=\"font-size:1.2em;color:#fff;\"></i> ${p.plan_nombre}</span>`;
+    } else {
+      badgeHtml = `<span class=\"badge badge-secondary\" style=\"color:#fff;\">Sin Plan</span>`;
+    }
+    $("#planBadge").html(badgeHtml);
+    // txtPlan eliminado, solo badge
     const estado = (p.estado_plan || "").toLowerCase();
     let estadoTexto = p.estado_plan || "Sin Plan";
+    let estadoBadge = "";
+    let estadoClass = "badge-secondary";
+    let estadoIcon = "fa-question-circle";
+    let estadoColor = "#adb5bd";
     if (estado === "activo") {
-      txtEstadoPlan
-        .text("Activo")
-        .removeClass("badge-secondary badge-warning")
-        .addClass("badge-success");
+      estadoClass = "badge-success";
+      estadoIcon = "fa-check-circle";
+      estadoColor = "#28a745";
       estadoTexto = "Activo";
     } else if (estado === "pendiente") {
-      txtEstadoPlan
-        .text("En espera")
-        .removeClass("badge-secondary badge-success")
-        .addClass("badge-warning");
+      estadoClass = "badge-warning";
+      estadoIcon = "fa-hourglass-half";
+      estadoColor = "#ffc107";
       estadoTexto = "En espera";
-    } else {
-      txtEstadoPlan
-        .text(estadoTexto)
-        .removeClass("badge-success badge-warning")
-        .addClass("badge-secondary");
     }
+    estadoBadge = `<span class=\"badge ${estadoClass}\" style=\"font-size:1.1em;padding:0.6em 1.2em;border-radius:1.5em;box-shadow:0 2px 8px rgba(0,0,0,0.10);background:${estadoColor};color:#fff;font-weight:600;display:inline-flex;align-items:center;gap:0.5em;\"><i class=\"fas ${estadoIcon}\" style=\"font-size:1.2em;color:#fff;\"></i> ${estadoTexto}</span>`;
+    $("#estadoPlanBadge").html(estadoBadge);
     txtInscripcion.val(formatDate(p.fecha_inscripcion) || "");
     txtMensualidad.val(formatNumber(p.monto_mensual) || "");
     txtInicioCobertura.val(formatDate(p.fecha_inicio_cobertura) || "");
-    txtDiasRestantes.val(
-      p.dias_para_cobertura >= 0 ? p.dias_para_cobertura : ""
-    );
+    if (estado === "activo") {
+      $("#grupoDiasRestantes").hide();
+      txtDiasRestantes.val("");
+    } else {
+      $("#grupoDiasRestantes").show();
+      txtDiasRestantes.val(
+        p.dias_para_cobertura >= 0 ? p.dias_para_cobertura : ""
+      );
+    }
     if (p.cobertura_activa === "si") btnAbrir.prop("disabled", false);
     else btnAbrir.prop("disabled", true);
     cargarConsumos(id);
@@ -132,7 +163,7 @@
   }
 
   function limpiarPaciente() {
-    txtPlan.val("");
+    // txtPlan eliminado, solo badge
     txtEstadoPlan
       .text("-")
       .removeClass("badge-success badge-warning")
@@ -141,6 +172,7 @@
     txtMensualidad.val("");
     txtInicioCobertura.val("");
     txtDiasRestantes.val("");
+    $("#grupoDiasRestantes").show();
     resumenConsumos.empty();
     tablaConsumos.empty();
     btnAbrir.prop("disabled", true);
@@ -158,12 +190,26 @@
         if (resp.status === "ok") {
           // KPIs
           const kpis = resp.kpis || [];
+          const iconMap = {
+            "Atenciones Primarias": "fa-user-md",
+            Laboratorios: "fa-vials",
+            "Consultas por Emergencia": "fa-ambulance",
+            "Observaciones por emergencia": "fa-notes-medical",
+            "Cirugías menores": "fa-syringe",
+            "Consultas con Especialistas": "fa-user-nurse",
+            Inmovilizaciones: "fa-crutch",
+            Ecografías: "fa-wave-square",
+            "Rayos X": "fa-x-ray",
+            "Consulta Odontológica": "fa-tooth",
+            "Limpieza Profunda": "fa-tooth",
+          };
           const htmlKPIs = kpis
             .map((k) => {
               const pct =
                 k.max > 0
                   ? Math.min(100, Math.round((k.usado / k.max) * 100))
                   : 0;
+              const icon = iconMap[k.nombre] || "fa-puzzle-piece";
               return (
                 '<div class="col-sm-6 col-lg-3 mb-3">\n' +
                 ' <div class="small-box ' +
@@ -185,7 +231,9 @@
                 pct +
                 "%)</p>\n" +
                 "   </div>\n" +
-                '   <div class="icon"><i class="fas fa-puzzle-piece"></i></div>\n' +
+                '   <div class="icon"><i class="fas ' +
+                icon +
+                '"></i></div>\n' +
                 " </div>\n" +
                 "</div>"
               );

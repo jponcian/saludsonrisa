@@ -70,37 +70,35 @@ if (!$paginaId || !in_array((int) $paginaId, $permisos_usuario, true)) {
                         <div class="card-body">
                             <div class="form-row">
                                 <div class="form-group col-md-6">
-                                    <label class="text-center">Paciente</label>
+                                    <label class="w-100 text-center">Paciente</label>
                                     <select id="selPaciente" class="form-control text-center">
                                         <option value="">Cargando...</option>
                                     </select>
                                 </div>
                                 <div class="form-group col-md-3">
-                                    <label class="text-center">Plan</label>
-                                    <input id="txtPlan" class="form-control text-center" readonly>
+                                    <label class="w-100 text-center">Plan</label>
+                                    <div id="planBadge" class="form-control text-center d-flex align-items-center justify-content-center" style="height:38px;padding:0;background:transparent;border:none;"></div>
                                 </div>
                                 <div class="form-group col-md-3">
-                                    <label class="text-center">Estado del Plan</label>
-                                    <div class="text-center">
-                                        <span id="estadoPlanBadge" class="badge" style="font-size: 1rem; padding: .5rem 1rem;">-</span>
-                                    </div>
+                                    <label class="w-100 text-center">Estado del Plan</label>
+                                    <div id="estadoPlanBadge" class="form-control text-center d-flex align-items-center justify-content-center" style="height:38px;padding:0;background:transparent;border:none;"></div>
                                 </div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group col-md-3">
-                                    <label class="text-center">Inscripción</label>
+                                    <label class="w-100 text-center">Inscripción</label>
                                     <input id="txtInscripcion" class="form-control text-center" readonly>
                                 </div>
                                 <div class="form-group col-md-3">
-                                    <label class="text-center">Inicio Cobertura (45 días)</label>
+                                    <label class="w-100 text-center">Inicio Cobertura (45 días)</label>
                                     <input id="txtInicioCobertura" class="form-control text-center" readonly>
                                 </div>
                                 <div class="form-group col-md-3">
-                                    <label class="text-center">Mensualidad</label>
+                                    <label class="w-100 text-center">Mensualidad</label>
                                     <input id="txtMensualidad" class="form-control text-right" readonly>
                                 </div>
-                                <div class="form-group col-md-3">
-                                    <label class="text-center">Días Restantes para Cobertura</label>
+                                <div class="form-group col-md-3" id="grupoDiasRestantes">
+                                    <label class="w-100 text-center">Días Restantes para Cobertura</label>
                                     <input id="txtDiasRestantes" class="form-control text-center" readonly>
                                 </div>
                             </div>
