@@ -38,6 +38,7 @@ try {
     // Construir la consulta principal (solo PDO)
     $sql = "SELECT ap.id, ap.motivo, ap.urgencia, ap.estado, DATE_FORMAT(ap.creado_en,'%Y-%m-%d %H:%i') AS creado,
                    CONCAT(p.nombres,' ',p.apellidos) AS paciente,
+                   ap.observaciones,
                    pl.nombre AS plan
             FROM atencion_procesos ap
             INNER JOIN pacientes p ON p.id=ap.paciente_id

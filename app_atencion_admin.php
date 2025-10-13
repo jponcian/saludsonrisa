@@ -157,6 +157,7 @@ if (!$paginaId || !in_array((int) $paginaId, $permisos_usuario, true)) {
                                         <tr>
                                             <th>ID</th>
                                             <th>Paciente</th>
+                                            <th>Observaciones</th>
                                             <th>Estado</th>
                                             <th>Creado</th>
                                             <th>Acciones</th>

@@ -318,6 +318,9 @@
               p.paciente +
               "</td>" +
               "<td>" +
+              (p.observaciones ? p.observaciones : "-") +
+              "</td>" +
+              "<td>" +
               p.estado +
               "</td>" +
               "<td>" +
