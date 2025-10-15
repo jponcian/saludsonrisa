@@ -99,7 +99,8 @@ if (!$paginaId || !in_array((int) $paginaId, $permisos_usuario, true)) {
                   <table id="tabla-usuarios" class="table table-bordered table-striped">
                     <thead>
                       <tr>
-                        <th>ID</th>
+                        <th>N°</th>
+                        <th style="display:none;">ID</th>
                         <th>Usuario</th>
                         <th>Foto</th>
                         <th>Nombre Completo</th>
@@ -332,7 +333,15 @@ if (!$paginaId || !in_array((int) $paginaId, $permisos_usuario, true)) {
           "dataSrc": "data"
         },
         "columns": [{
-            "data": "id"
+            // Contador visual
+            "data": null,
+            "render": function(data, type, row, meta) {
+              return meta.row + 1;
+            }
+          },
+          {
+            "data": "id",
+            "visible": false // Oculta la columna ID pero la mantiene para acciones
           }, {
             "data": "username"
           }, {

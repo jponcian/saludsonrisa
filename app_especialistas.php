@@ -86,7 +86,8 @@ $current_page = basename($_SERVER['PHP_SELF']);
                   <table id="tabla-especialistas" class="table table-bordered table-striped">
                     <thead>
                       <tr>
-                        <th>ID</th>
+                        <th>N°</th>
+                        <th style="display:none;">ID</th>
                         <th>Usuario</th>
                         <th>Nombre Completo</th>
                         <th>Especialidades</th>
@@ -161,7 +162,15 @@ $current_page = basename($_SERVER['PHP_SELF']);
           "dataSrc": "data"
         },
         "columns": [{
-            "data": "id"
+            // Contador visual
+            "data": null,
+            "render": function(data, type, row, meta) {
+              return meta.row + 1;
+            }
+          },
+          {
+            "data": "id",
+            "visible": false // Oculta la columna ID pero la mantiene para acciones
           },
           {
             "data": "username"
